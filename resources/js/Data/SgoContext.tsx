@@ -1,11 +1,4 @@
-import {
-    createContext,
-    useCallback,
-    useContext,
-    useMemo,
-    useState,
-    type ReactNode,
-} from 'react';
+import { createContext, useCallback, useContext, useMemo, useState, type ReactNode } from 'react';
 
 import { criarEstadoInicial } from '@/Data/seed';
 import type {
@@ -76,6 +69,9 @@ const Contexto = createContext<ContextoSgo | null>(null);
 
 /** O utilizador com que o painel arranca, antes de o selector mudar. */
 const VER_COMO_POR_DEFEITO = 'u1';
+
+/** O perfil com que a folha abre: dá para voltar a ele a partir do selector. */
+export const PERFIL_INICIAL = VER_COMO_POR_DEFEITO;
 
 export function ProvedorSgo({ children }: { children: ReactNode }) {
     const [estado, definirEstado] = useState<EstadoSgo>(criarEstadoInicial);
@@ -173,7 +169,11 @@ export function ProvedorSgo({ children }: { children: ReactNode }) {
     );
 
     const actualizar = useCallback(
-        <N extends NomeColeccao>(coleccao: N, id: string, alteracoes: Partial<EstadoSgo[N][number]>) => {
+        <N extends NomeColeccao>(
+            coleccao: N,
+            id: string,
+            alteracoes: Partial<EstadoSgo[N][number]>,
+        ) => {
             definirEstado((actual) => {
                 const lista = actual[coleccao] as Array<{ id: string }>;
 

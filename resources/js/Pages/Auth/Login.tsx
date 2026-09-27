@@ -2,7 +2,7 @@ import { Head, Link, useForm } from '@inertiajs/react';
 import { CircleAlert, Loader2 } from 'lucide-react';
 import { type FormEvent } from 'react';
 
-import { ProvedorSgo, useSgo } from '@/Data/SgoContext';
+import { useSgo } from '@/Data/SgoContext';
 import { LayoutAuth } from '@/Layouts/LayoutAuth';
 import { rotuloPerfil } from '@/lib/rotulos';
 
@@ -26,18 +26,16 @@ import { toast } from '@/Components/ui/toaster';
  */
 export default function Login() {
     return (
-        <ProvedorSgo>
-            <LayoutAuth>
-                <Head title="Entrar — SGO">
-                    <meta
-                        name="description"
-                        content="Entrar no painel do SGO. Autenticação real; o selector «Ver como» escolhe os dados visíveis."
-                    />
-                </Head>
+        <LayoutAuth>
+            <Head title="Entrar — SGO">
+                <meta
+                    name="description"
+                    content="Entrar no painel do SGO. Autenticação real; o selector «Ver como» escolhe os dados visíveis."
+                />
+            </Head>
 
-                <FormularioLogin />
-            </LayoutAuth>
-        </ProvedorSgo>
+            <FormularioLogin />
+        </LayoutAuth>
     );
 }
 

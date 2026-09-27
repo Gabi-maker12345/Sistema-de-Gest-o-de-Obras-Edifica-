@@ -33,7 +33,7 @@ export function Campo({
             <Label htmlFor={htmlFor}>
                 {rotulo}
                 {obrigatorio && (
-                    <span aria-hidden className="text-amber">
+                    <span aria-hidden className="text-amber-ink">
                         *
                     </span>
                 )}

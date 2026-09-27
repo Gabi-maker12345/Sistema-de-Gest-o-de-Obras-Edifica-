@@ -38,6 +38,34 @@ Regras não negociáveis:
 - Marketing é **monocromático**: grafite sobre papel, carimbo para identidade, âmbar só na acção. Nada defotografia, gradientes ou cor decorativa.
 - Todos os tons existem em variantes `-08`, `-12`, `-16`, `-20`, `-32`, `-48`, `-64` geradas por `color-mix`. Não inventar hex novos.
 
+### Pressão de tinta: a mesma tinta só muda de função, nunca de papel
+
+Rácios medidos sobre `--paper` (`#E9EDEA`), WCAG AA a 4,5:1 para texto e 3:1 para
+contorno ou símbolo com significado:
+
+| Token | Rácio | Pode ser |
+| --- | --- | --- |
+| `--graphite` | 17,8:1 | texto, estrutura |
+| `--stamp` | 7,5:1 | texto de identidade, matriz, selo |
+| `--amber-ink` | 6,2:1 | **texto e contorno** de âmbar |
+| `--red-pencil` | 5,2:1 | atraso, erro, rejeição |
+| `--graphite-64` | 5,0:1 | a `.cota` — o segundo passo mais escuro |
+| `--stamp-64` | 3,3:1 | divisória, tracejado — **nunca** texto a 11px |
+| `--graphite-48` | 3,1:1 | só decoração sem conteúdo |
+| `--amber` | **2,3:1** | **só enchimento**, nunca texto nem contorno |
+
+Duas regras que daí saem, e que um ecrã novo não pode violar:
+
+- **O âmbar é um enchimento, não uma cor de leitura.** Preenchido com grafite por
+  cima dá 6,4:1 e é o botão primário. Como texto ou como anel de foco, desce para
+  `--amber-ink` — que é o mesmo âmbar a outra pressão, não um hex novo.
+- **Nenhuma variante alfa de tinta serve para texto pequeno.** `-64` e abaixo são
+  traço, divisória e hachura. Texto a 11px lê-se com o token cheio ou com
+  `--graphite-64`.
+
+O anel de foco é âmbar-ink, e o `.cota` é `graphite-64`: são as duas excepções que
+já violariam a regra acima se fossem tiradas.
+
 ## Tipografia
 
 - **Archivo** para tudo o que se lê (`--font-sans`). Robusta, de drafting, sem ser decorativa.
@@ -55,6 +83,9 @@ Regras não negociáveis:
 4. **Carimbo** — a identidade do registo, sempre presente em `text-stamp`, com `--rodado` (rotação de 2 a 4 graus) e `matriz`.
 
 `EstadoSelo` é a única forma de mostrar estado. Não criar variantes por ecrã.
+E dentro dele, o estado nunca é carimbo: a tinta de carimbo é identidade, e um
+`Selo` que a usa deixa de dizer o que é. `medio` e `leve` diferem **só** no peso
+do traço — é essa diferença que os separa, e é para isso que serve.
 
 ## Superfícies e limites
 
@@ -166,6 +197,7 @@ reservado a texto decorativo sem conteúdo (numeração de lista, marca de fiche
 ## Checklist de revisão (antes de dar um ecrã por pronto)
 
 - [ ] Fundo `--paper`, texto `--graphite`; nenhuma cor fora dos cinco tokens.
+- [ ] Nenhum texto a 11px numa variante alfa (`-64` ou menos) nem em `--amber` puro.
 - [ ] Existe carimbo com a identidade do registo em que se está.
 - [ ] Cada estado é lido por peso de traço, não só por cor.
 - [ ] Existe pelo menos uma cota e uma anotação a lápis no ecrã.

@@ -19,6 +19,11 @@ const variantes = cva(
                 lapis: 'border-red-pencil text-red-pencil',
                 grafite: 'border-graphite-32 text-graphite-64',
                 neutro: 'border-graphite-20 text-graphite-48',
+                // A pasta: o cartao manila. Texto na pressao escura do cartao,
+                // nunca o cartao em si — 0,53:1 sobre papel.
+                pasta: 'border-pasta bg-pasta text-pasta-ink',
+                // Para o que vive na tábua, onde o grafite em alfa desaparece.
+                tinta: 'border-tinta-32 text-tinta-72',
             },
             traco: {
                 firme: 'border-2 font-semibold',
@@ -56,6 +61,11 @@ export function Selo({ className, tinta, traco, tamanho, ...props }: SeloProps) 
  * Recebe o valor interno (`em_execucao`) e devolve o rotulo em extenso
  * com o peso de traco correspondente — nunca um valor cru, nunca so cor.
  *
+ * O peso do traco e a codificacao: `medio` e `leve` diferem so nisso, e e
+ * isso que os separa. A tinta de carimbo fica de fora de propósito, porque no
+ * contrato ela e identidade e nao estado; so o lapis vermelho entra aqui, e so
+ * para atraso, erro e rejeicao.
+ *
  * Os ecras passam `estado={projeto.estadoGeral}`, nunca
  * `<Selo>{projeto.estadoGeral}</Selo>`.
  */
@@ -73,7 +83,7 @@ export function EstadoSelo({
 
     return (
         <Selo
-            tinta={critico ? 'lapis' : traco === 'medio' ? 'carimbo' : 'grafite'}
+            tinta={critico ? 'lapis' : 'grafite'}
             traco={traco}
             tamanho={tamanho}
             className={className}

@@ -1,56 +1,146 @@
 @import 'tailwindcss';
 
 /*
-| SGO — THE ROLL, o carimbo da prancha técnica
-| Paleta exacta da spec §11. A cor nunca é estado: o estado é peso de traço.
+| SGO — A MESA DE DESENHO
+|
+| O mundo nao mudou de metaphor: continua a ser a prancha tecnica, o carimbo da
+| folha, a cota e a hachura. O que mudou foi o substrato.
+|
+| Antes o painel era papel do topo ao pe — quatro tons de quase-branco com
+| estrutura a 4%-20% de grafite. Era literalmente pastel, e a folha nao tinha
+| mesa onde pousar. Agora ha uma TABAUA de grafite (a prancheta, o caixilho, a
+| gaveta) e a FOLHA de papel pousada em cima, que e o que uma folha de desenho
+| e de facto. A folha passa a ler-se como folha porque tem borda em volta.
+|
+| Tres-pressure rule, agora com dois substratos:
+|   - sobre o papel, a tinta e o grafite em alfa 08..64 e o papel cheio;
+|   - sobre a tabua, a tinta e o MESMO papel em alfa 08..64, e o papel cheio.
+| A mesma escada de pressao dos dois lados. E o que impede a tábua de virar
+| mais um cinzento: o escuro tem a mesma gramática de leitura que o claro.
+|
+| Paleta: cinco tintas de origem (papel, grafite, carimbo, ambar, lapis
+| vermelho) mais uma familia nova — A PASTA, o cartao manila da pasta de
+| desenho. A pasta e a unica cor que nao vem do registo, e chega com a
+| temperatura que faltava. Comporta-se como o ambar: e um ENCHIMENTO (nunca
+| texto sobre papel), e quando tem de ser lida usa a pressao escura
+| correspondente (--pasta-ink), o mesmo ambar a outra pressao.
 */
 
 @theme {
-    /* --- Paleta da spec (§11) -------------------------------------------- */
+    /* --- As cinco tintas de origem --------------------------------------- */
     --color-paper: #e9edea;
     --color-graphite: #15181a;
     --color-stamp: #31409e;
     --color-amber: #d98a0b;
     --color-red-pencil: #b4321c;
 
-    /* --- Derivações: a mesma tinta a outra pressão ------------------------ */
-    /* Grafite estrutural: linhas de cota, grelha, hachura. */
+    /* --- A TABUA: o grafite como chao, nao como cor de texto --------------
+       |graphite| sobre a tábua dá 1,06:1 e sobre o papel dá 17,8:1. A mesma
+       tinta, duas substrates, e por isso o valor da tábua é o grafite
+       *levantado* um passo: a prancheta é a mesa, não a tinta sobre ela. */
+    --color-tabua: #0e1113;
+    --color-placa: #1a1f22;
+    --color-placa-alta: #232a2e;
+
+    /* --- Grafite estrutural (sobre o papel) ------------------------------ */
     --color-graphite-04: color-mix(in srgb, #15181a 4%, transparent);
     --color-graphite-08: color-mix(in srgb, #15181a 8%, transparent);
     --color-graphite-12: color-mix(in srgb, #15181a 12%, transparent);
+    --color-graphite-16: color-mix(in srgb, #15181a 16%, transparent);
     --color-graphite-20: color-mix(in srgb, #15181a 20%, transparent);
+    --color-graphite-24: color-mix(in srgb, #15181a 24%, transparent);
     --color-graphite-32: color-mix(in srgb, #15181a 32%, transparent);
     --color-graphite-48: color-mix(in srgb, #15181a 48%, transparent);
     --color-graphite-64: color-mix(in srgb, #15181a 64%, transparent);
 
-    /* Papel: a folha e as suas dobras. */
-    --color-paper-sunken: #dfe4e1;
-    --color-paper-raised: #f4f7f5;
-    --color-paper-deep: #ced5d1;
+    /* --- Grafite como enchimento (sobre a tábua) -------------------------
+       Divisórias e réguas do lado escuro. Não é o grafite em alfa — é o
+       grafite opaco a 12%, 20% e 32% *sobre a tábua*, que é o mesmo numero
+       com outro fundo e portanto outra tinta. */
+    --color-regua-12: color-mix(in srgb, #ffffff 12%, transparent);
+    --color-regua-20: color-mix(in srgb, #ffffff 20%, transparent);
+    --color-regua-32: color-mix(in srgb, #ffffff 32%, transparent);
+    --color-regua-48: color-mix(in srgb, #ffffff 48%, transparent);
 
-    /* Tinta de carimbo: identidade, matriz, escala, selo. */
+    /* --- Papel: a folha e as suas dobras ---------------------------------- */
+    --color-paper-sunken: #dbe2df;
+    --color-paper-raised: #f4f7f5;
+    --color-paper-deep: #c7cfcb;
+
+    /* --- TINTA: o papel usado como tinta, sobre a tábua ------------------
+       A escada de pressão do lado escuro. Medidas sobre --tabua (#0E1113):
+         tinta       16,1:1   texto corrente e estrutural
+         tinta-72     8,2:1   texto secundário e etiquetas
+         tinta-48     3,9:1   texto grande, e só
+         tinta-32     2,6:1   traço, divisória, hachura
+         tinta-16     1,6:1   malha de fundo
+         tinta-08     1,3:1   separação de peça
+       Nenhum texto pequeno vive abaixo de -72. É a regra que existia para o
+       papel, transcrita para a tábua em vez de inventada de novo. */
+    --color-tinta: #e9edea;
+    --color-tinta-96: color-mix(in srgb, #e9edea 96%, transparent);
+    --color-tinta-72: color-mix(in srgb, #e9edea 72%, transparent);
+    --color-tinta-48: color-mix(in srgb, #e9edea 48%, transparent);
+    --color-tinta-32: color-mix(in srgb, #e9edea 32%, transparent);
+    --color-tinta-16: color-mix(in srgb, #e9edea 16%, transparent);
+    --color-tinta-08: color-mix(in srgb, #e9edea 8%, transparent);
+
+    /* --- A PASTA: o cartao manila da pasta de desenho ---------------------
+       Única família nova. Vive onde há que separar sem recorrer a outra cor:
+       as separadoras do índice, a placa de título, a cabeça da fila de
+       aprovação. É um ENCHIMENTO: 0,53:1 sobre papel, nunca texto.
+         pasta        8,5:1 sobre a tábua  ·  8,2:1 com grafite por cima
+         pasta-ink    9,3:1 sobre o papel  ·  4,9:1 sobre a pasta  */
+    --color-pasta: #c8a96b;
+    --color-pasta-ink: #4a3a16;
+    --color-pasta-08: color-mix(in srgb, #c8a96b 8%, transparent);
+    --color-pasta-16: color-mix(in srgb, #c8a96b 16%, transparent);
+    --color-pasta-32: color-mix(in srgb, #c8a96b 32%, transparent);
+    --color-pasta-64: color-mix(in srgb, #c8a96b 64%, transparent);
+    /* A chapa de papel dentro da pasta: onde as separadoras levam o carimbo. */
+    --color-pasta-clara: #e2d2ab;
+
+    /* --- Tinta de carimbo: identidade. Ganhou a pressão de cima ------------
+       |stamp| sobre a tábua dá 2,2:1 — ilegível. A identidade continua
+       identidade na tábua, só que noutra pressão: 7,1:1. */
+    --color-stamp: #31409e;
     --color-stamp-08: color-mix(in srgb, #31409e 8%, transparent);
     --color-stamp-16: color-mix(in srgb, #31409e 16%, transparent);
     --color-stamp-32: color-mix(in srgb, #31409e 32%, transparent);
     --color-stamp-64: color-mix(in srgb, #31409e 64%, transparent);
+    --color-stamp-alto: #8b98ee;
+    --color-stamp-alto-08: color-mix(in srgb, #8b98ee 8%, transparent);
+    --color-stamp-alto-16: color-mix(in srgb, #8b98ee 16%, transparent);
+    --color-stamp-alto-32: color-mix(in srgb, #8b98ee 32%, transparent);
 
-    /* Âmbar: a acção. Nunca estado, nunca decoração. */
+    /* --- Âmbar: a acção. Nunca estado, nunca decoração. -------------------
+       O âmbar puro é um ENCHIMENTO — 2,3:1 sobre papel, não pode ser texto
+       nem contorno. Sobre a tábua dá 5,4:1 e pode, mas a pressão de cima é a
+       que se usa: 10,5:1, o mesmo âmbar iluminado. */
+    --color-amber: #d98a0b;
     --color-amber-08: color-mix(in srgb, #d98a0b 8%, transparent);
     --color-amber-16: color-mix(in srgb, #d98a0b 16%, transparent);
     --color-amber-32: color-mix(in srgb, #d98a0b 32%, transparent);
     --color-amber-64: color-mix(in srgb, #d98a0b 64%, transparent);
     --color-amber-ink: #7a4c05;
+    --color-amber-alto: #f5b54a;
+    --color-amber-alto-08: color-mix(in srgb, #f5b54a 8%, transparent);
+    --color-amber-alto-16: color-mix(in srgb, #f5b54a 16%, transparent);
+    --color-amber-alto-32: color-mix(in srgb, #f5b54a 32%, transparent);
 
-    /* Lápis vermelho: atraso, erro, rejeição. Reservado. */
+    /* --- Lápis vermelho: atraso, erro, rejeição. Reservado. -------------- */
+    --color-red-pencil: #b4321c;
     --color-red-pencil-08: color-mix(in srgb, #b4321c 8%, transparent);
     --color-red-pencil-16: color-mix(in srgb, #b4321c 16%, transparent);
     --color-red-pencil-32: color-mix(in srgb, #b4321c 32%, transparent);
+    --color-red-pencil-64: color-mix(in srgb, #b4321c 64%, transparent);
+    --color-red-pencil-alto: #f0785e;
+    --color-red-pencil-alto-16: color-mix(in srgb, #f0785e 16%, transparent);
+    --color-red-pencil-alto-32: color-mix(in srgb, #f0785e 32%, transparent);
 
     /* --- Tipografia: robusta, de drafting ------------------------------- */
-    --font-sans:
-        'Archivo', ui-sans-serif, system-ui, -apple-system, 'Segoe UI', sans-serif;
-    --font-mono:
-        'IBM Plex Mono', ui-monospace, 'SFMono-Regular', 'Cascadia Mono', monospace;
+    --font-sans: 'Archivo', ui-sans-serif, system-ui, -apple-system, 'Segoe UI', sans-serif;
+    --font-mono: 'IBM Plex Mono', ui-monospace, 'SFMono-Regular', 'Cascadia Mono', monospace;
 
     --text-2xs: 0.6875rem;
     --text-2xs--line-height: 1rem;
@@ -59,15 +149,20 @@
     /* --- Raios: o traço de caneta não é redondo ------------------------- */
     --radius-nib: 1px;
     --radius-selo: 2px;
+    --radius-solda: 3px;
 
-    /* --- Sombras: só a que a folha faz ao ser levantada ----------------- */
+    /* --- Sombra: o que a folha faz ao ser levantada da tábua -------------
+       Offset duro e curto, como sempre. Sobre a tábua, a folha levanta-se
+       para a luz: a sombra é a mesma, muda o fundo. */
     --shadow-folha: 0 1px 0 0 color-mix(in srgb, #15181a 8%, transparent);
     --shadow-levantada: 0 2px 0 0 color-mix(in srgb, #15181a 12%, transparent);
     --shadow-selo: 3px 3px 0 0 color-mix(in srgb, #15181a 14%, transparent);
+    --shadow-prancha: 0 2px 0 0 #05070880;
+    --shadow-folha-alta: 0 1px 0 0 #ffffff14;
 }
 
 /* ==========================================================================
-   Base — a folha
+   Base — a folha e a tábua
    ========================================================================== */
 
 @layer base {
@@ -90,14 +185,25 @@
         text-rendering: optimizeLegibility;
     }
 
-    /* A acção é âmbar. O foco também. */
+    /* A acção é âmbar. O foco também — mas à pressão certa: o âmbar puro
+       sobre papel dá 2,3:1 e falha o mínimo de 3:1 de um contorno, e este
+       produto é lido no estaleiro sob luz directa. Sobre a tábua, a pressão
+       de cima. */
     :focus-visible {
-        outline: 2px solid var(--color-amber);
+        outline: 2px solid var(--color-amber-ink);
         outline-offset: 2px;
+    }
+
+    [data-superficie='tabua'] :focus-visible {
+        outline-color: var(--color-amber-alto);
     }
 
     ::selection {
         background-color: var(--color-stamp-16);
+    }
+
+    [data-superficie='tabua'] ::selection {
+        background-color: var(--color-stamp-alto-32);
     }
 
     /* Números, datas e dinheiro em coluna: tabular, nunca proporcional. */
@@ -119,10 +225,19 @@
         color: var(--color-graphite-32);
     }
 
+    [data-superficie='tabua'] input::placeholder,
+    [data-superficie='tabua'] textarea::placeholder {
+        color: var(--color-tinta-32);
+    }
+
     /* Barras de deslocação discretas, como o veio de um gabarito. */
     * {
         scrollbar-width: thin;
         scrollbar-color: var(--color-graphite-20) transparent;
+    }
+
+    [data-superficie='tabua'] * {
+        scrollbar-color: var(--color-tinta-16) transparent;
     }
 }
 
@@ -134,7 +249,7 @@
 @utility hachura-45 {
     background-image: repeating-linear-gradient(
         45deg,
-        var(--color-graphite-12) 0 1px,
+        var(--color-graphite-16) 0 1px,
         transparent 1px 7px
     );
 }
@@ -143,44 +258,48 @@
 @utility hachura-90 {
     background-image: repeating-linear-gradient(
         90deg,
-        var(--color-graphite-08) 0 1px,
+        var(--color-graphite-12) 0 1px,
         transparent 1px 24px
+    );
+}
+
+/* Hachura da tábua: a mesma hachura, trocando a tinta. */
+@utility hachura-t {
+    background-image: repeating-linear-gradient(
+        45deg,
+        var(--color-tinta-16) 0 1px,
+        transparent 1px 7px
     );
 }
 
 /* Malha de fundo da prancha: só visível quando se procura. */
 @utility malha-prancha {
     background-image:
-        repeating-linear-gradient(
-            90deg,
-            var(--color-graphite-04) 0 1px,
-            transparent 1px 32px
-        ),
-        repeating-linear-gradient(
-            0deg,
-            var(--color-graphite-04) 0 1px,
-            transparent 1px 32px
-        );
+        repeating-linear-gradient(90deg, var(--color-graphite-04) 0 1px, transparent 1px 32px),
+        repeating-linear-gradient(0deg, var(--color-graphite-04) 0 1px, transparent 1px 32px);
+}
+
+/* Malha da tábua: a prancheta também é um gabarito. */
+@utility malha-t {
+    background-image:
+        repeating-linear-gradient(90deg, var(--color-tinta-08) 0 1px, transparent 1px 32px),
+        repeating-linear-gradient(0deg, var(--color-tinta-08) 0 1px, transparent 1px 32px);
 }
 
 /* Fibra do papel: duas hachuras cruzadas de baixíssimo contraste. */
 @utility fibra-papel {
     background-image:
-        repeating-linear-gradient(
-            92deg,
-            var(--color-graphite-04) 0 1px,
-            transparent 1px 3px
-        ),
-        repeating-linear-gradient(
-            2deg,
-            var(--color-graphite-04) 0 1px,
-            transparent 1px 3px
-        );
+        repeating-linear-gradient(92deg, var(--color-graphite-04) 0 1px, transparent 1px 3px),
+        repeating-linear-gradient(2deg, var(--color-graphite-04) 0 1px, transparent 1px 3px);
 }
 
 /* A folha activa é a mais escura do tabuleiro (diagrama de metro). */
 @utility linha-activa {
     box-shadow: inset 3px 0 0 0 var(--color-amber);
+}
+
+@utility linha-activa-t {
+    box-shadow: inset 3px 0 0 0 var(--color-amber-alto);
 }
 
 @utility tracalho {
@@ -207,6 +326,17 @@
         color: var(--color-graphite-64);
     }
 
+    /* A mesma cota, escrita sobre a tábua. A tábua é mais escura, por isso a
+       cota sobe de pressão: -64 daria 3,9:1 e a 11px seria ilegível. */
+    .cota-t {
+        font-family: var(--font-mono);
+        font-size: var(--text-2xs);
+        line-height: 1rem;
+        letter-spacing: 0.06em;
+        text-transform: uppercase;
+        color: var(--color-tinta-72);
+    }
+
     /* Matriz do carimbo: a caixa de identificação do registo. */
     .matriz {
         border: 1px solid currentColor;
@@ -219,42 +349,163 @@
     }
 
     /* Anotação de prancha presa por linha de chamada: a letra a lápis do canto
-       do desenho. Mais ténue que a cota, porque é mais informal — mas nunca
-       decorativa, por isso não desce abaixo de -48. */
+       do desenho. */
     .anotacao {
         font-family: var(--font-mono);
         font-size: var(--text-2xs);
         line-height: 1rem;
         letter-spacing: 0.04em;
-        color: var(--color-graphite-48);
+        color: var(--color-graphite-64);
+    }
+
+    .anotacao-t {
+        font-family: var(--font-mono);
+        font-size: var(--text-2xs);
+        line-height: 1rem;
+        letter-spacing: 0.04em;
+        color: var(--color-tinta-72);
     }
 }
 
 /* ==========================================================================
-   Barra de progresso — execução física e execução financeira
+   A FOLHA pousada na tábua
+   --------------------------------------------------------------------------
+   A folha não é um cartão: é a folha. Por isso não tem contorno próprio — o
+   que a separa da tábua é a sombra que faz ao ser levantada, mais a malha
+   que só aparece no caixilho. A aresta é o encontro de dois materiais.
+   ========================================================================== */
+
+@utility folha {
+    position: relative;
+    background-color: var(--color-paper);
+    box-shadow: var(--shadow-prancha);
+}
+
+/* A margem de plotação: onde a folha respira antes do desenho. A fibra do
+   papel só se vê aqui — no miolo é ruído. */
+@utility margem-plotacao {
+    background-image:
+        repeating-linear-gradient(92deg, var(--color-graphite-04) 0 1px, transparent 1px 3px),
+        repeating-linear-gradient(2deg, var(--color-graphite-04) 0 1px, transparent 1px 3px);
+}
+
+/* ==========================================================================
+   Movimento — o momento autoral
+   --------------------------------------------------------------------------
+   Um só, na abertura: a folha assenta na tábua e as barras são medidas. É o
+   gesto do ofício — pousar a folha e traçar a cota — e acontece uma vez, com
+   ordem, não como um efeito colado a cada elemento.
+   ========================================================================== */
+
+@layer components {
+    @keyframes assentar {
+        from {
+            opacity: 0;
+            transform: translate3d(0, -10px, 0);
+        }
+        to {
+            opacity: 1;
+            transform: translate3d(0, 0, 0);
+        }
+    }
+
+    @keyframes medir {
+        from {
+            transform: scaleX(0);
+        }
+        to {
+            transform: scaleX(1);
+        }
+    }
+
+    @keyframes riscar-cota {
+        from {
+            transform: scaleX(0);
+        }
+        to {
+            transform: scaleX(1);
+        }
+    }
+
+    .assentar {
+        animation: assentar 340ms cubic-bezier(0.16, 1, 0.3, 1) both;
+    }
+
+    /* A barra mede-se da esquerda para a direita, a partir do zero. */
+    .medir {
+        transform-origin: left center;
+        animation: medir 520ms cubic-bezier(0.16, 1, 0.3, 1) both;
+    }
+
+    .riscar-cota {
+        transform-origin: left center;
+        animation: riscar-cota 420ms cubic-bezier(0.16, 1, 0.3, 1) both;
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+        .assentar,
+        .medir,
+        .riscar-cota {
+            animation: none;
+        }
+    }
+}
+
+/* ==========================================================================
+   Medidor — a barra que mede uma execução
+   --------------------------------------------------------------------------
+   Duas truths sobrepostas. O enchimento é o que o registo mede: sólido para a
+   execução física (o que está construído, um facto) e hachurado a 45º para a
+   financeira (o que está aprovado, um cálculo sobre o contrato). A testemunha
+   é a cota que diz onde está a outra, sem a escrever.
    ========================================================================== */
 
 @layer components {
     .medidor {
         --medidor-preenchimento: 0%;
+        --medidor-atraso: 0%;
         position: relative;
-        height: 0.5rem;
+        height: 0.625rem;
         width: 100%;
         overflow: hidden;
         border: 1px solid var(--color-graphite-32);
         background-color: var(--color-paper-sunken);
         background-image: repeating-linear-gradient(
             90deg,
-            var(--color-graphite-12) 0 1px,
+            var(--color-graphite-16) 0 1px,
             transparent 1px 6px
         );
     }
 
+    /* O registo é solido; o calculo é hachura. Por isso o gráfico da folha
+       também usa as duas: físico sólido, financeiro hachurado. A mesma
+       leitura, nos dois sítios, sem legenda nova. */
     .medidor > span {
         position: absolute;
         inset-block: 0;
         left: 0;
         width: var(--medidor-preenchimento);
         background-color: var(--color-graphite);
+    }
+
+    .medidor > span[data-medido='derivado'] {
+        background-image: repeating-linear-gradient(
+            45deg,
+            var(--color-paper) 0 1px,
+            transparent 1px 5px
+        );
+    }
+
+    /* A marca de testemunha: a cota que diz onde está o outro valor. O núcleo
+       é papel com um bordo de grafite porque a barra também é grafite. */
+    .medidor > .medidor-marca {
+        position: absolute;
+        inset-block: -1px;
+        left: var(--medidor-marca);
+        width: 2px;
+        background-color: var(--color-paper);
+        box-shadow:
+            -1px 0 0 0 var(--color-graphite),
+            1px 0 0 0 var(--color-graphite);
     }
 }

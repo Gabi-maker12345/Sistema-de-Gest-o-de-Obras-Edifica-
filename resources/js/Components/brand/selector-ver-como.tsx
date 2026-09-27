@@ -1,6 +1,6 @@
-import { Eye } from 'lucide-react';
+import { Eye, RotateCcw } from 'lucide-react';
 
-import { useSgo } from '@/Data/SgoContext';
+import { PERFIL_INICIAL, useSgo } from '@/Data/SgoContext';
 import { iniciais } from '@/lib/format';
 import { rotuloPerfil, rotuloPapel, temAcessoTotal } from '@/lib/rotulos';
 import { cn } from '@/lib/utils';
@@ -9,49 +9,70 @@ import {
     Menu,
     MenuConteudo,
     MenuDisparador,
+    MenuItem,
     MenuItemRadio,
     MenuLegenda,
     MenuRadio,
     MenuSeparador,
 } from '@/Components/ui/dropdown-menu';
 import { Selo } from '@/Components/ui/badge';
+import { toast } from '@/Components/ui/toaster';
 
 /**
  * O selector "Ver como" (D5).
  *
  * É uma afinidade de demonstração: escolhe qual utilizador de exemplo estamos
- * a simular para efectos de filtragem de dados. Não altera a sessão real —
- * quem continua autenticado é o utilizador do Breeze.
+ * a simular para efeitos de filtragem de dados. Não altera a sessão real —
+ * quem continua autenticado é o utilizador do Breeze. Por isso a troca
+ * confirma-se com uma nota: quem está a ver e quem continua com sessão.
  */
-export function SelectorVerComo({ className, compacto = false }: { className?: string; compacto?: boolean }) {
+export function SelectorVerComo({
+    className,
+    compacto = false,
+}: {
+    className?: string;
+    compacto?: boolean;
+}) {
     const { utilizadores, utilizadorEfectivo, definirVerComo, estado } = useSgo();
+
+    function mudarPara(utilizadorId: string) {
+        const alvo = utilizadores.find((candidato) => candidato.id === utilizadorId);
+
+        definirVerComo(utilizadorId);
+
+        if (alvo) {
+            toast(`A ver como ${alvo.nome}`, {
+                description: `${alvo.cargo ?? rotuloPerfil(alvo.perfil)} — só os dados visíveis mudaram. A sessão real é a mesma.`,
+            });
+        }
+    }
 
     return (
         <Menu>
             <MenuDisparador
                 className={cn(
-                    'group flex items-center gap-2 border border-graphite-32 bg-paper-raised px-2 py-1.5 text-left',
-                    'transition-colors hover:border-graphite-64',
+                    'group flex items-center gap-2 border border-regua-20 bg-placa px-2 py-1.5 text-left',
+                    'text-tinta transition-colors hover:border-tinta-32 hover:bg-placa-alta',
                     className,
                 )}
             >
                 <span
                     aria-hidden
-                    className="grid size-6 shrink-0 place-items-center bg-stamp font-mono text-2xs font-semibold text-paper"
+                    className="grid size-6 shrink-0 place-items-center bg-stamp-alto font-mono text-2xs font-semibold text-tabua"
                 >
                     {iniciais(utilizadorEfectivo.nome)}
                 </span>
 
                 {!compacto && (
                     <span className="min-w-0">
-                        <span className="cota block leading-none">Ver como</span>
-                        <span className="block truncate text-sm font-medium leading-tight">
+                        <span className="cota-t block leading-none">Ver como</span>
+                        <span className="block truncate text-sm font-medium leading-tight text-tinta">
                             {utilizadorEfectivo.nome}
                         </span>
                     </span>
                 )}
 
-                <Eye aria-hidden className="size-4 shrink-0 text-graphite-32" />
+                <Eye aria-hidden className="size-4 shrink-0 text-tinta-32" />
             </MenuDisparador>
 
             <MenuConteudo align="start" className="w-80">
@@ -59,7 +80,7 @@ export function SelectorVerComo({ className, compacto = false }: { className?: s
 
                 <MenuRadio
                     value={utilizadorEfectivo.id}
-                    onValueChange={(valor) => definirVerComo(valor)}
+                    onValueChange={(valor) => mudarPara(valor)}
                 >
                     {utilizadores.map((utilizador) => {
                         const acessos = estado.acessos.filter(
@@ -109,6 +130,15 @@ export function SelectorVerComo({ className, compacto = false }: { className?: s
                 </MenuRadio>
 
                 <MenuSeparador />
+
+                <MenuItem
+                    onSelect={() => mudarPara(PERFIL_INICIAL)}
+                    disabled={utilizadorEfectivo.id === PERFIL_INICIAL}
+                    className="text-xs"
+                >
+                    <RotateCcw aria-hidden />
+                    Voltar ao perfil com que a folha abriu
+                </MenuItem>
 
                 <p className="px-2 py-1.5 font-mono text-2xs leading-relaxed tracking-normal text-graphite-48 normal-case">
                     Afinemidade de demonstração. A sessão real não muda: só os dados visíveis.

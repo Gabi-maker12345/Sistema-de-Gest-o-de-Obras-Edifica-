@@ -34,10 +34,10 @@ export function Carimbo({
             </p>
 
             {linhas.length > 0 && (
-                <dl className="mt-1 space-y-px font-mono text-2xs leading-none tracking-[0.04em] text-stamp-64">
+                <dl className="mt-1 space-y-px font-mono text-2xs leading-none tracking-[0.04em] text-stamp">
                     {linhas.map((linha) => (
                         <div key={linha.chave} className="flex gap-1.5">
-                            <dt className="shrink-0 uppercase">{linha.chave}</dt>
+                            <dt className="shrink-0 text-stamp-64 uppercase">{linha.chave}</dt>
                             <dd className="truncate border-b border-dotted border-stamp-32">
                                 {linha.valor}
                             </dd>

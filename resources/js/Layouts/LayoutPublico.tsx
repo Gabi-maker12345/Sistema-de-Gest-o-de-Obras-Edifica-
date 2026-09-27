@@ -2,16 +2,15 @@ import { Link } from '@inertiajs/react';
 import { Menu, X } from 'lucide-react';
 import { useState, type ReactNode } from 'react';
 
-import { ProvedorSgo } from '@/Data/SgoContext';
 import { dataExtenso } from '@/lib/format';
 import { cn } from '@/lib/utils';
 
 import { LinkEstacao } from '@/Components/brand/link-estacao';
+import { AcoesSessao } from '@/Components/brand/acoes-sessao';
 import { BarraRevisao } from '@/Components/brand/barra-revisao';
 import { Carimbo } from '@/Components/brand/carimbo';
 import { Marca } from '@/Components/brand/marca';
 import { Toaster } from '@/Components/ui/toaster';
-import { Botao } from '@/Components/ui/button';
 
 /**
  * O percurso público é um diagrama de metro: uma linha, estações, e a estação
@@ -35,7 +34,7 @@ export function LayoutPublico({ children }: { children: ReactNode }) {
     const [aberto, definirAberto] = useState(false);
 
     return (
-        <ProvedorSgo>
+        <>
             <div className="fibra-papel min-h-dvh bg-paper">
                 {/* Borda de plotagem: onde a folha se prende ao rolo. */}
                 <div className="hidden border-b border-graphite-12 bg-paper-sunken lg:block">
@@ -66,9 +65,7 @@ export function LayoutPublico({ children }: { children: ReactNode }) {
                         </nav>
 
                         <div className="ml-auto flex items-center gap-2">
-                            <Botao asChild tamanho="sm" variante="primario">
-                                <Link href={route('login')}>Entrar</Link>
-                            </Botao>
+                            <AcoesSessao />
 
                             <button
                                 type="button"
@@ -113,7 +110,7 @@ export function LayoutPublico({ children }: { children: ReactNode }) {
             </div>
 
             <Toaster />
-        </ProvedorSgo>
+        </>
     );
 }
 

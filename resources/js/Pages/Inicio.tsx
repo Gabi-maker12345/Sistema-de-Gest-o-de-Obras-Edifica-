@@ -289,7 +289,7 @@ function Modulos() {
                                 <div className="flex items-center gap-3 sm:flex-col sm:items-start">
                                     <span
                                         aria-hidden
-                                        className="linha-activa grid size-9 place-items-center border border-graphite bg-amber font-mono text-xs font-bold text-graphite"
+                                        className="grid size-9 place-items-center border border-graphite bg-amber font-mono text-xs font-bold text-graphite"
                                     >
                                         {estacao.estacao}
                                     </span>
