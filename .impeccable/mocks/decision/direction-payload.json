@@ -1,0 +1,144 @@
+{
+  "title": "Escolher o mundo visual",
+  "question": "O sorteio atribuiu O carimbo da prancha técnica. Mantém, toma uma alternativa, ou volta a sortear.",
+  "options": [
+    {
+      "id": "assigned",
+      "label": "O carimbo da prancha técnica",
+      "kicker": "THE ROLL",
+      "lineage": "prancha técnica plotada — carimbo, revisão, hachura 45°",
+      "thesis": "Cada ecrã é uma folha de uma prancha: o carimbo vivo leva a identidade do registo, o estado é pressão de tinta e nada se perde em caixas.",
+      "palette": ["#E9EDEA", "#15181A", "#31409E", "#D98A0B", "#B4321C"],
+      "materials": ["papel de plotter", "hachura 45°/90°", "tinta de carimbo"],
+      "viewport": "A capa do jogo de folhas: SGO em letra de dibujante, carimbo no canto inferior direito já preenchido com metadados reais, e a promessa do produto escrita como quem preenche um documento.",
+      "risk": "Desenho técnico é um cliché conhecido: falha se a hachura virar pano de fundo e o carimbo ficar decorativo em vez de sistema.",
+      "raised": [
+        { "from": "terminais de cracktro", "raise": "O estado passa a ser peso e posição do traço, nunca mais uma cor: verificado é traço firme, pendente é traço leve com anel de lápis vermelho." },
+        { "from": "marketing monocromático", "raise": "Cada afirmação do site público nasce encostada ao ecrã que a prova, desenhado no vocabulário da própria prancha." },
+        { "from": "diagrama de metro", "raise": "A folha em que se está é sempre a mais escura do tabuleiro: navegação e percurso marcam a folha activa com tinta mais carregada." },
+        { "from": "coluna tensegrity", "raise": "A grelha obedece ao registo: campos derivados e notas recebem linha de chamada, como uma anotação de prancha, em vez de caixotes iguais." }
+      ],
+      "wireframe": {
+        "cols": 12,
+        "rows": 10,
+        "regions": [
+          { "label": "numeração de folha", "x": 0, "y": 0, "w": 2, "h": 1 },
+          { "label": "SGO em letra de dibujante", "x": 0, "y": 1, "w": 7, "h": 3, "accent": true },
+          { "label": "carimbo com metadados reais", "x": 7, "y": 4, "w": 5, "h": 6, "accent": true },
+          { "label": "estado por peso de traço", "x": 0, "y": 4, "w": 7, "h": 3 },
+          { "label": "acção primária", "x": 0, "y": 7, "w": 4, "h": 2 },
+          { "label": "marco de folha", "x": 11, "y": 9, "w": 1, "h": 1 }
+        ]
+      }
+    },
+    {
+      "id": "model-pick",
+      "label": "O livro de obra",
+      "kicker": "IMPECCABLE’S PICK",
+      "lineage": "livro de obra pautado, autocópias, carimbo de visto",
+      "thesis": "O sistema é o livro pautado que a obra já preenche à mão: colunas fixas, totais a correr, visto em carimbo, prova em três vias.",
+      "palette": ["#EFEFEA", "#1B1D1C", "#9E2B1E", "#2F5FA8"],
+      "materials": ["papel pautado", "autocópia", "carimbo de visto"],
+      "viewport": "A capa é a primeira página do livro, com a caixa impressa do cabeçalho e a linha do dia aberta a meio.",
+      "risk": "É o registo que a equipa já preenche: conhecido e eficaz, e por isso mesmo fácil de ficar genérico se as colunas não carregarem o resto.",
+      "wireframe": {
+        "cols": 12,
+        "rows": 10,
+        "regions": [
+          { "label": "caixa impressa do cabeçalho", "x": 0, "y": 0, "w": 12, "h": 2 },
+          { "label": "título da obra", "x": 0, "y": 2, "w": 8, "h": 2, "accent": true },
+          { "label": "colunas: data / actividade / visto", "x": 0, "y": 4, "w": 9, "h": 5 },
+          { "label": "carimbo de visto", "x": 9, "y": 4, "w": 3, "h": 3, "accent": true },
+          { "label": "acção primária", "x": 9, "y": 7, "w": 3, "h": 2 }
+        ]
+      }
+    },
+    {
+      "id": "challenger-quadro",
+      "label": "O quadro de serviço da obra",
+      "verdict": "competitive",
+      "lineage": "painel de partidas com flaps em cascata",
+      "thesis": "O painel é o quadro de partidas da obra: cada projecto é uma linha, cada marco é uma hora de partida, o atraso acende a lâmpada âmbar.",
+      "palette": ["#1A1A19", "#F2F2EF", "#D98A0B", "#8A2A22"],
+      "materials": ["flap de acetato", "aço escovado", "lâmpada de fila"],
+      "viewport": "A capa abre com a tabela de quadros a cascadear carácter a carácter, e as linhas atrasadas acesas em âmbar.",
+      "risk": "Precisa de rigor: sem células fixas e sem a grade intacta, o quadro lê-se só como nostalgia.",
+      "case": "Funde-se bem — as linhas do quadro são exactamente a pergunta do gestor, «onde está este projecto?». Perde na identificação: ninguém dentro de uma obra se reconhece num painel de estação.",
+      "wireframe": {
+        "cols": 12,
+        "rows": 10,
+        "regions": [
+          { "label": "chapa de aço escovado", "x": 0, "y": 0, "w": 12, "h": 1 },
+          { "label": "fileiras de flaps: obra / marco / hora", "x": 0, "y": 1, "w": 12, "h": 6, "accent": true },
+          { "label": "lâmpada âmbar de atraso", "x": 10, "y": 2, "w": 2, "h": 1 },
+          { "label": "acção primária", "x": 0, "y": 7, "w": 4, "h": 2 },
+          { "label": "peça de torniquete", "x": 11, "y": 9, "w": 1, "h": 1 }
+        ]
+      }
+    },
+    {
+      "id": "challenger-caixas",
+      "label": "A pilha de caixas do armazém",
+      "verdict": "competitive",
+      "lineage": "caixas de material com etiqueta impressa e tampa em cartolina",
+      "thesis": "Cada projecto é uma caixa empilhada com etiqueta de topo; puxar a caixa meia fora é abrir o projecto, e dentro há folhas.",
+      "palette": ["#B85A20", "#1A1614", "#F0EBE0", "#2F7A6B"],
+      "materials": ["cartão kraft", "tinta serigrafada", "forro de papel"],
+      "viewport": "A capa mostra a parede de caixas empilhadas com a etiqueta de topo de cada obra legível à distância.",
+      "risk": "A tampa a abrir em 3d é o momento inteiro: se essa dobradiça falhar, fica uma lista de caixas.",
+      "case": "Funde-se bem — «um projecto é a unidade de contexto» é literalmente uma caixa fechada com etiqueta. Perde na identificação: a equipa lida com paletes e sacos de material, não com caixas de calçado.",
+      "wireframe": {
+        "cols": 12,
+        "rows": 10,
+        "regions": [
+          { "label": "parede de caixas empilhadas", "x": 0, "y": 0, "w": 12, "h": 7, "accent": true },
+          { "label": "etiqueta de topo: obra / cliente / estado", "x": 1, "y": 2, "w": 5, "h": 2 },
+          { "label": "caixa puxada meia fora", "x": 6, "y": 3, "w": 5, "h": 3 },
+          { "label": "acção primária", "x": 0, "y": 8, "w": 4, "h": 1 }
+        ]
+      }
+    },
+    {
+      "id": "challenger-cracktro",
+      "label": "Terminais de cracktro",
+      "verdict": "declined",
+      "lineage": "ecrã de título em vazio emissivo, bitmap, camadas de poeira",
+      "palette": ["#000000", "#E8E4D8", "#D98A0B"],
+      "materials": ["bitmap", "vazio emissivo", "camadas de poeira"],
+      "case": "Funde-se mal: um vazio preto emissivo é hostil a um escritório em Angola e a um campo sob sol forte; e um sinal sem grelha destrói a leitura de dinheiro e datas.",
+      "kept": "Estado como brilho e posição, nunca uma cor a mais."
+    },
+    {
+      "id": "challenger-metro",
+      "label": "Diagrama de metro",
+      "verdict": "declined",
+      "lineage": "azulejo de linhas de metro em enamel azul-meia-noite",
+      "palette": ["#0E1B3D", "#F4F1E9", "#D98A0B", "#C0392B"],
+      "materials": ["enamel", "círculos de intercâmbio", "linhas a 45° e 90°"],
+      "case": "Funde-se mal: um diagrama é uma vista, não uma superfície de trabalho; o painel precisa de listas, formulários e tabelas densas, e a malha de rede seria uma luta de organização espacial.",
+      "kept": "O diagrama é a navegação, e a linha escolhida queima mais forte."
+    },
+    {
+      "id": "challenger-tensegrity",
+      "label": "Coluna tensegrity",
+      "verdict": "declined",
+      "lineage": "coluna de hastes de carbono e corda vermelha em chão de betão",
+      "palette": ["#15171A", "#D8D6CF", "#B4321C"],
+      "materials": ["carbono", "corda", "chão de betão"],
+      "case": "Funde-se mal: escultura não é desenho de trabalho; ninguém numa obra se reconhece numa coluna de arte, e a rede de dependências briga com a densidade do modo Operar.",
+      "kept": "A grelha obedece à rede, não à página; anotações presas por linha de chamada."
+    }
+  ],
+  "reroll": { "registers": ["safer", "bolder"] },
+  "buildPath": { "value": "code", "toggle": false },
+  "canon": true,
+  "canonCard": {
+    "label": "O standard da categoria",
+    "thesis": "O que esta categoria lança sempre, executado sem ironia e com todo o ofício.",
+    "palette": ["#FFFFFF", "#111827", "#2563EB"],
+    "materials": ["grelha limpa", "capturas de ecrã", "um único acento"],
+    "viewport": "A disposição que o visitante espera: hero com título grande, grelha de funcionalidades com ícone, sombra suave.",
+    "risk": "Indistinguível da concorrência por desenho — é esse o ponto."
+  },
+  "steer": true
+}

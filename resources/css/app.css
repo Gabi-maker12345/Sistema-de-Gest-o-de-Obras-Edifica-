@@ -1,3 +1,260 @@
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+@import 'tailwindcss';
+
+/*
+| SGO — THE ROLL, o carimbo da prancha técnica
+| Paleta exacta da spec §11. A cor nunca é estado: o estado é peso de traço.
+*/
+
+@theme {
+    /* --- Paleta da spec (§11) -------------------------------------------- */
+    --color-paper: #e9edea;
+    --color-graphite: #15181a;
+    --color-stamp: #31409e;
+    --color-amber: #d98a0b;
+    --color-red-pencil: #b4321c;
+
+    /* --- Derivações: a mesma tinta a outra pressão ------------------------ */
+    /* Grafite estrutural: linhas de cota, grelha, hachura. */
+    --color-graphite-04: color-mix(in srgb, #15181a 4%, transparent);
+    --color-graphite-08: color-mix(in srgb, #15181a 8%, transparent);
+    --color-graphite-12: color-mix(in srgb, #15181a 12%, transparent);
+    --color-graphite-20: color-mix(in srgb, #15181a 20%, transparent);
+    --color-graphite-32: color-mix(in srgb, #15181a 32%, transparent);
+    --color-graphite-48: color-mix(in srgb, #15181a 48%, transparent);
+    --color-graphite-64: color-mix(in srgb, #15181a 64%, transparent);
+
+    /* Papel: a folha e as suas dobras. */
+    --color-paper-sunken: #dfe4e1;
+    --color-paper-raised: #f4f7f5;
+    --color-paper-deep: #ced5d1;
+
+    /* Tinta de carimbo: identidade, matriz, escala, selo. */
+    --color-stamp-08: color-mix(in srgb, #31409e 8%, transparent);
+    --color-stamp-16: color-mix(in srgb, #31409e 16%, transparent);
+    --color-stamp-32: color-mix(in srgb, #31409e 32%, transparent);
+    --color-stamp-64: color-mix(in srgb, #31409e 64%, transparent);
+
+    /* Âmbar: a acção. Nunca estado, nunca decoração. */
+    --color-amber-08: color-mix(in srgb, #d98a0b 8%, transparent);
+    --color-amber-16: color-mix(in srgb, #d98a0b 16%, transparent);
+    --color-amber-32: color-mix(in srgb, #d98a0b 32%, transparent);
+    --color-amber-64: color-mix(in srgb, #d98a0b 64%, transparent);
+    --color-amber-ink: #7a4c05;
+
+    /* Lápis vermelho: atraso, erro, rejeição. Reservado. */
+    --color-red-pencil-08: color-mix(in srgb, #b4321c 8%, transparent);
+    --color-red-pencil-16: color-mix(in srgb, #b4321c 16%, transparent);
+    --color-red-pencil-32: color-mix(in srgb, #b4321c 32%, transparent);
+
+    /* --- Tipografia: robusta, de drafting ------------------------------- */
+    --font-sans:
+        'Archivo', ui-sans-serif, system-ui, -apple-system, 'Segoe UI', sans-serif;
+    --font-mono:
+        'IBM Plex Mono', ui-monospace, 'SFMono-Regular', 'Cascadia Mono', monospace;
+
+    --text-2xs: 0.6875rem;
+    --text-2xs--line-height: 1rem;
+    --text-2xs--letter-spacing: 0.06em;
+
+    /* --- Raios: o traço de caneta não é redondo ------------------------- */
+    --radius-nib: 1px;
+    --radius-selo: 2px;
+
+    /* --- Sombras: só a que a folha faz ao ser levantada ----------------- */
+    --shadow-folha: 0 1px 0 0 color-mix(in srgb, #15181a 8%, transparent);
+    --shadow-levantada: 0 2px 0 0 color-mix(in srgb, #15181a 12%, transparent);
+    --shadow-selo: 3px 3px 0 0 color-mix(in srgb, #15181a 14%, transparent);
+}
+
+/* ==========================================================================
+   Base — a folha
+   ========================================================================== */
+
+@layer base {
+    *,
+    ::after,
+    ::before {
+        border-color: var(--color-graphite-20);
+    }
+
+    html {
+        -webkit-text-size-adjust: 100%;
+    }
+
+    body {
+        background-color: var(--color-paper);
+        color: var(--color-graphite);
+        font-family: var(--font-sans);
+        font-synthesis-weight: none;
+        -webkit-font-smoothing: antialiased;
+        text-rendering: optimizeLegibility;
+    }
+
+    /* A acção é âmbar. O foco também. */
+    :focus-visible {
+        outline: 2px solid var(--color-amber);
+        outline-offset: 2px;
+    }
+
+    ::selection {
+        background-color: var(--color-stamp-16);
+    }
+
+    /* Números, datas e dinheiro em coluna: tabular, nunca proporcional. */
+    .tabular,
+    table {
+        font-variant-numeric: tabular-nums;
+    }
+
+    input,
+    textarea,
+    select,
+    button {
+        font: inherit;
+        color: inherit;
+    }
+
+    input::placeholder,
+    textarea::placeholder {
+        color: var(--color-graphite-32);
+    }
+
+    /* Barras de deslocação discretas, como o veio de um gabarito. */
+    * {
+        scrollbar-width: thin;
+        scrollbar-color: var(--color-graphite-20) transparent;
+    }
+}
+
+/* ==========================================================================
+   Utilitários do registo — hachura, cota, carimbo
+   ========================================================================== */
+
+/* Hachura a 45°: o enchimento de cortes e de áreas reservadas. */
+@utility hachura-45 {
+    background-image: repeating-linear-gradient(
+        45deg,
+        var(--color-graphite-12) 0 1px,
+        transparent 1px 7px
+    );
+}
+
+/* Hachura a 90°: malha fina, usada em cotas de grelha. */
+@utility hachura-90 {
+    background-image: repeating-linear-gradient(
+        90deg,
+        var(--color-graphite-08) 0 1px,
+        transparent 1px 24px
+    );
+}
+
+/* Malha de fundo da prancha: só visível quando se procura. */
+@utility malha-prancha {
+    background-image:
+        repeating-linear-gradient(
+            90deg,
+            var(--color-graphite-04) 0 1px,
+            transparent 1px 32px
+        ),
+        repeating-linear-gradient(
+            0deg,
+            var(--color-graphite-04) 0 1px,
+            transparent 1px 32px
+        );
+}
+
+/* Fibra do papel: duas hachuras cruzadas de baixíssimo contraste. */
+@utility fibra-papel {
+    background-image:
+        repeating-linear-gradient(
+            92deg,
+            var(--color-graphite-04) 0 1px,
+            transparent 1px 3px
+        ),
+        repeating-linear-gradient(
+            2deg,
+            var(--color-graphite-04) 0 1px,
+            transparent 1px 3px
+        );
+}
+
+/* A folha activa é a mais escura do tabuleiro (diagrama de metro). */
+@utility linha-activa {
+    box-shadow: inset 3px 0 0 0 var(--color-amber);
+}
+
+@utility tracalho {
+    background-image: repeating-linear-gradient(
+        -45deg,
+        var(--color-amber) 0 3px,
+        transparent 3px 6px
+    );
+}
+
+/* ==========================================================================
+   Componentes do registo
+   ========================================================================== */
+
+@layer components {
+    /* Rótulo de cota: a legenda que acompanha uma linha de chamada. Nunca mais
+       ténue do que o conteúdo que rotula — a 11px a inversão agrava-se. */
+    .cota {
+        font-family: var(--font-mono);
+        font-size: var(--text-2xs);
+        line-height: 1rem;
+        letter-spacing: 0.06em;
+        text-transform: uppercase;
+        color: var(--color-graphite-64);
+    }
+
+    /* Matriz do carimbo: a caixa de identificação do registo. */
+    .matriz {
+        border: 1px solid currentColor;
+        border-radius: var(--radius-selo);
+    }
+
+    /* Título de bloco da prancha: linha dupla, como no bloco de desenho. */
+    .bloco-titulo {
+        border-bottom: 3px double var(--color-graphite-32);
+    }
+
+    /* Anotação de prancha presa por linha de chamada: a letra a lápis do canto
+       do desenho. Mais ténue que a cota, porque é mais informal — mas nunca
+       decorativa, por isso não desce abaixo de -48. */
+    .anotacao {
+        font-family: var(--font-mono);
+        font-size: var(--text-2xs);
+        line-height: 1rem;
+        letter-spacing: 0.04em;
+        color: var(--color-graphite-48);
+    }
+}
+
+/* ==========================================================================
+   Barra de progresso — execução física e execução financeira
+   ========================================================================== */
+
+@layer components {
+    .medidor {
+        --medidor-preenchimento: 0%;
+        position: relative;
+        height: 0.5rem;
+        width: 100%;
+        overflow: hidden;
+        border: 1px solid var(--color-graphite-32);
+        background-color: var(--color-paper-sunken);
+        background-image: repeating-linear-gradient(
+            90deg,
+            var(--color-graphite-12) 0 1px,
+            transparent 1px 6px
+        );
+    }
+
+    .medidor > span {
+        position: absolute;
+        inset-block: 0;
+        left: 0;
+        width: var(--medidor-preenchimento);
+        background-color: var(--color-graphite);
+    }
+}

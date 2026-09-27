@@ -4,19 +4,22 @@
         <meta charset="utf-8">
         <meta name="viewport" content="width=device-width, initial-scale=1">
 
-        <title inertia>{{ config('app.name', 'Laravel') }}</title>
+        <title inertia>{{ config('app.name', 'SGO') }}</title>
 
-        <!-- Fonts -->
+        {{-- Fonte de sistema para a letra de desenhista, monoespaçada para a cota. --}}
         <link rel="preconnect" href="https://fonts.bunny.net">
-        <link href="https://fonts.bunny.net/css?family=figtree:400,500,600&display=swap" rel="stylesheet" />
+        <link
+            href="https://fonts.bunny.net/css?family=archivo:wght@400;500;600;700&family=ibm-plex-mono:wght@400;500;600&display=swap"
+            rel="stylesheet"
+        />
 
-        <!-- Scripts -->
+        {{-- Scripts --}}
         @routes
         @viteReactRefresh
-        @vite(['resources/js/app.jsx', "resources/js/Pages/{$page['component']}.jsx"])
+        @vite(['resources/js/app.tsx', "resources/js/Pages/{$page['component']}.tsx"])
         @inertiaHead
     </head>
-    <body class="font-sans antialiased">
+    <body class="bg-paper font-sans text-graphite antialiased">
         @inertia
     </body>
 </html>
