@@ -34,7 +34,7 @@ export function BlocoTitulo({
         >
             {campos.map((campo) => (
                 <div key={campo.chave} className="bg-paper px-2.5 py-1.5">
-                    <dt className="text-graphite-32">{campo.chave}</dt>
+                    <dt className="text-graphite-64">{campo.chave}</dt>
                     <dd className="truncate font-medium text-graphite">{campo.valor}</dd>
                 </div>
             ))}

@@ -49,10 +49,16 @@ export function LayoutAdmin({ children }: { children: ReactNode }) {
                     {/* A folha. Ocupa a largura toda e é a tábua que lhe dá a
                         aresta: em ecrã largo vê-se o caixilho dos dois lados. */}
                     <main id="conteudo" className="flex-1 bg-tabua">
-                        <div className="folha min-h-[calc(100dvh-3.5rem)] xl:my-6 xl:mr-6">
-                            <div className="margem-plotacao border-b border-graphite-12">
-                                {children}
-                            </div>
+                        <div className="folha flex min-h-[calc(100dvh-3.5rem)] flex-col xl:my-6 xl:mr-6">
+                            {/* A margem de plotação: a faixa onde a fibra do papel
+                                se vê, porque é aí que a folha respira antes do
+                                desenho. Antes esta textura estava no contentor do
+                                `children` — ou seja, em cima de toda a tabela — e o
+                                que era ruído de margem acabava por ser ruído de
+                                conteúdo, a tirar nitidez ao grafite. */}
+                            <div className="h-8 shrink-0 border-b border-graphite-20 margem-plotacao" />
+
+                            <div className="flex-1">{children}</div>
                         </div>
                     </main>
 

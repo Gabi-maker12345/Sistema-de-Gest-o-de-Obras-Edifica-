@@ -140,7 +140,7 @@ export function SelectorVerComo({
                     Voltar ao perfil com que a folha abriu
                 </MenuItem>
 
-                <p className="px-2 py-1.5 font-mono text-2xs leading-relaxed tracking-normal text-graphite-48 normal-case">
+                <p className="px-2 py-1.5 font-mono text-2xs leading-relaxed tracking-normal text-graphite-64 normal-case">
                     Afinemidade de demonstração. A sessão real não muda: só os dados visíveis.
                 </p>
             </MenuConteudo>

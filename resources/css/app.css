@@ -508,4 +508,51 @@
             -1px 0 0 0 var(--color-graphite),
             1px 0 0 0 var(--color-graphite);
     }
+
+    /* O mesmo medidor escrito sobre a tábua. Não é uma variante decorativa: é
+       a mesma gramografia com a tinta trocada, para que o bloco de título do
+       desenho não tenha uma peça de papel colada no meio. A hachura continua a
+       ser o derivado e o sólido continua a ser o registo. */
+    .medidor-t {
+        --medidor-preenchimento: 0%;
+        --medidor-atraso: 0%;
+        position: relative;
+        height: 0.625rem;
+        width: 100%;
+        overflow: hidden;
+        border: 1px solid var(--color-regua-48);
+        background-color: color-mix(in srgb, #ffffff 4%, var(--color-tabua));
+        background-image: repeating-linear-gradient(
+            90deg,
+            var(--color-tinta-16) 0 1px,
+            transparent 1px 6px
+        );
+    }
+
+    .medidor-t > span {
+        position: absolute;
+        inset-block: 0;
+        left: 0;
+        width: var(--medidor-preenchimento);
+        background-color: var(--color-tinta);
+    }
+
+    .medidor-t > span[data-medido='derivado'] {
+        background-image: repeating-linear-gradient(
+            45deg,
+            var(--color-tabua) 0 1px,
+            transparent 1px 5px
+        );
+    }
+
+    .medidor-t > .medidor-marca {
+        position: absolute;
+        inset-block: -1px;
+        left: var(--medidor-marca);
+        width: 2px;
+        background-color: var(--color-tabua);
+        box-shadow:
+            -1px 0 0 0 var(--color-tinta),
+            1px 0 0 0 var(--color-tinta);
+    }
 }

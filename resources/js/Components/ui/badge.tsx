@@ -18,7 +18,10 @@ const variantes = cva(
                 ambar: 'border-amber text-amber-ink',
                 lapis: 'border-red-pencil text-red-pencil',
                 grafite: 'border-graphite-32 text-graphite-64',
-                neutro: 'border-graphite-20 text-graphite-48',
+                // O selo neutro é a variante mais usada do produto — é a de tudo o
+                // que não é estado — e por isso tem de se ler. A 11px, o
+                // `graphite-48` dava 3,1:1 e falhava o mínimo do texto pequeno.
+                neutro: 'border-graphite-32 text-graphite-64',
                 // A pasta: o cartao manila. Texto na pressao escura do cartao,
                 // nunca o cartao em si — 0,53:1 sobre papel.
                 pasta: 'border-pasta bg-pasta text-pasta-ink',

@@ -17,7 +17,7 @@ export function LinhaCota({
     className?: string;
 }) {
     return (
-        <div aria-hidden className={cn('text-graphite-32', grelha, className)}>
+        <div aria-hidden className={cn(grelha, className)}>
             {colunas.map((coluna) => (
                 <div
                     key={coluna}

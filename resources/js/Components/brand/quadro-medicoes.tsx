@@ -7,6 +7,13 @@ import { cn } from '@/lib/utils';
  * `nota` escreve a definicao ao pe da leitura, a lapis, como quem assina uma
  * nota de rodape numa prancha. Existe porque a media so e verdadeira com o
  * criterio escrito ao lado.
+ *
+ * `superficie` escolhe o substrato. Sobre `papel` as celulas sao de papel com a
+ * grelha a grafite; sobre `tabua` sao a prancheta escura com a regua a tinta.
+ * O painel usa `tabua` porque o bloco de titulo de um desenho e a unica massa
+ * escura da folha — e e ai que o olho tem de cair primeiro. Sem essa massa, seis
+ * numeros a graphite sobre papel leem-se como seis etiquetas e a folha fica
+ * lavada por dentro, com o escuro todo acumulado na moldura.
  */
 export interface Medicao {
     rotulo: string;
@@ -23,38 +30,68 @@ export function QuadroMedicoes({
     medicoes,
     className,
     colunas = 2,
+    superficie = 'papel',
 }: {
     medicoes: Medicao[];
     className?: string;
     colunas?: 2 | 3;
+    superficie?: 'papel' | 'tabua';
 }) {
+    const tabua = superficie === 'tabua';
+
     return (
         <dl
             className={cn(
-                'grid gap-px border border-graphite-32 bg-graphite-20',
+                'grid gap-px',
+                // A grelha e o fundo do contentor; a celula e a placa. Sobre a
+                // tabua a grelha e a regua (tinta) e nao o grafite em alfa, que
+                // sobre um fundo escuro desaparece.
+                tabua
+                    ? 'border border-regua-32 bg-regua-12'
+                    : 'border border-graphite-32 bg-graphite-20',
                 colunas === 3 ? 'grid-cols-3' : 'grid-cols-2',
                 className,
             )}
         >
             {medicoes.map((medicao) => (
-                <div key={medicao.rotulo} className="bg-paper px-3 py-2">
-                    <dt className="cota">{medicao.rotulo}</dt>
+                <div
+                    key={medicao.rotulo}
+                    className={cn('px-3 py-2.5', tabua ? 'bg-tabua' : 'bg-paper')}
+                >
+                    <dt className={tabua ? 'cota-t' : 'cota'}>{medicao.rotulo}</dt>
                     <dd
                         title={medicao.numero === undefined ? undefined : String(medicao.numero)}
                         className={cn(
-                            'mt-0.5 flex items-baseline gap-1 font-mono text-2xl leading-none font-medium tabular',
-                            medicao.critico ? 'text-red-pencil' : 'text-graphite',
+                            'mt-1 flex items-baseline gap-1 font-mono text-3xl leading-none font-medium tabular',
+                            medicao.critico
+                                ? tabua
+                                    ? 'text-red-pencil-alto'
+                                    : 'text-red-pencil'
+                                : tabua
+                                  ? 'text-tinta'
+                                  : 'text-graphite',
                         )}
                     >
                         {medicao.valor}
                         {medicao.unidade && (
-                            <span className="text-2xs font-normal text-graphite-48">
+                            <span
+                                className={
+                                    tabua
+                                        ? 'text-2xs font-normal text-tinta-72'
+                                        : 'text-2xs font-normal text-graphite-64'
+                                }
+                            >
                                 {medicao.unidade}
                             </span>
                         )}
                     </dd>
                     {medicao.nota && (
-                        <p className="anotacao mt-1 border-l-2 border-graphite-12 pl-1.5 normal-case">
+                        <p
+                            className={cn(
+                                'mt-1.5 border-l-2 pl-1.5 normal-case',
+                                tabua ? 'anotacao-t border-regua-32' : 'anotacao border-graphite-32',
+                            )}
+                        >
                             {medicao.nota}
                         </p>
                     )}
@@ -79,22 +116,31 @@ export function LeituraExecucoes({
     fisica,
     financeira,
     className,
+    superficie = 'papel',
 }: {
     fisica: number;
     financeira: number;
     className?: string;
+    superficie?: 'papel' | 'tabua';
 }) {
     const desvio = fisica - financeira;
     const atrasada = desvio >= 10;
+    const tabua = superficie === 'tabua';
 
     return (
-        <div className={cn('bg-paper px-3 py-2.5', className)}>
+        <div className={cn('px-3 py-2.5', tabua ? 'bg-tabua' : 'bg-paper', className)}>
             <div className="flex items-baseline justify-between gap-2">
-                <dt className="cota">Execuções · mesma escala</dt>
+                <dt className={tabua ? 'cota-t' : 'cota'}>Execuções · mesma escala</dt>
                 <span
                     className={cn(
                         'font-mono text-sm font-semibold tabular',
-                        atrasada ? 'text-red-pencil' : 'text-graphite',
+                        atrasada
+                            ? tabua
+                                ? 'text-red-pencil-alto'
+                                : 'text-red-pencil'
+                            : tabua
+                              ? 'text-tinta'
+                              : 'text-graphite',
                     )}
                     title="Execução física menos execução financeira, em pontos percentuais"
                 >
@@ -103,21 +149,30 @@ export function LeituraExecucoes({
                 </span>
             </div>
 
-            <div className="mt-2 space-y-1.5">
+            <div className="mt-2.5 space-y-2">
                 <BarraExecucao
                     rotulo="Física"
                     valor={fisica}
                     legenda={`${Math.round(fisica)}% concluído, média das actividades`}
+                    tabua={tabua}
                 />
                 <BarraExecucao
                     rotulo="Financeira"
                     valor={financeira}
                     derivado
                     legenda={`${Math.round(financeira)}% do valor contratual já aprovado`}
+                    tabua={tabua}
                 />
             </div>
 
-            <p className="anotacao mt-2 border-l-2 border-graphite-12 pl-1.5 normal-case">
+            <p
+                className={cn(
+                    'mt-2.5 border-l-2 pl-1.5 normal-case',
+                    tabua
+                        ? 'anotacao-t border-regua-32'
+                        : 'anotacao border-graphite-32',
+                )}
+            >
                 {atrasada
                     ? 'O trabalho já foi executado e ainda não está pago: a medição está à frente do aprovado.'
                     : 'Aprovado e executado à mesma frente. Acima de 10 pp o desenho está a correr à frente da factura.'}
@@ -131,19 +186,21 @@ function BarraExecucao({
     valor,
     derivado = false,
     legenda,
+    tabua = false,
 }: {
     rotulo: string;
     valor: number;
     derivado?: boolean;
     legenda: string;
+    tabua?: boolean;
 }) {
     const limitado = Math.max(0, Math.min(100, valor));
 
     return (
         <div className="grid grid-cols-[64px_1fr_40px] items-center gap-2">
-            <span className="cota truncate">{rotulo}</span>
+            <span className={tabua ? 'cota-t truncate' : 'cota truncate'}>{rotulo}</span>
             <div
-                className="medidor h-2"
+                className={tabua ? 'medidor-t h-2' : 'medidor h-2'}
                 role="img"
                 aria-label={legenda}
                 style={
@@ -154,7 +211,13 @@ function BarraExecucao({
             >
                 <span data-medido={derivado ? 'derivado' : 'registo'} className="medir" />
             </div>
-            <span className="text-right font-mono text-xs font-medium tabular text-graphite">
+            <span
+                className={
+                    tabua
+                        ? 'text-right font-mono text-xs font-medium tabular text-tinta'
+                        : 'text-right font-mono text-xs font-medium tabular text-graphite'
+                }
+            >
                 {Math.round(limitado)}%
             </span>
         </div>

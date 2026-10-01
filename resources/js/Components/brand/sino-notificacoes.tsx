@@ -67,7 +67,7 @@ export function SinoNotificacoes() {
                 <MenuSeparador />
 
                 {estado.notificacoes.length === 0 && (
-                    <p className="px-2 py-3 text-sm text-graphite-48">Sem notificações.</p>
+                    <p className="px-2 py-3 text-sm text-graphite-64">Sem notificações.</p>
                 )}
 
                 {estado.notificacoes.map((notificacao) => (
@@ -76,7 +76,7 @@ export function SinoNotificacoes() {
                         onSelect={() => marcarNotificacaoLida(notificacao.id)}
                         className={cn(
                             'items-start py-2',
-                            notificacao.lida ? 'text-graphite-48' : 'text-graphite',
+                            notificacao.lida ? 'text-graphite-64' : 'text-graphite',
                         )}
                     >
                         <MarcaNotificacao lida={notificacao.lida} />
@@ -85,7 +85,7 @@ export function SinoNotificacoes() {
                             <span className="anotacao mt-0.5 block normal-case">
                                 {notificacao.corpo}
                             </span>
-                            <span className="cota mt-1 block text-graphite-32">
+                            <span className="cota mt-1 block">
                                 {quando(notificacao.criadoEm)}
                             </span>
                         </span>

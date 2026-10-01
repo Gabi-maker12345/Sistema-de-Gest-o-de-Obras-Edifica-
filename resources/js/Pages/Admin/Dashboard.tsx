@@ -158,25 +158,39 @@ function ZonaCabecalho({
 }) {
     return (
         <header className="flex flex-wrap items-start justify-between gap-8">
-            <div className="min-w-0 max-w-sm space-y-3">
+            <div className="min-w-0 max-w-md space-y-3">
                 <p className="cota">Painel · folha de rosto</p>
-                <h1 className="text-3xl font-semibold tracking-tight text-graphite">
-                    {nome.split(' ')[0]}
+
+                {/*
+                 * O h1 é o assunto do dia, e o conteúdo tem de o igualar: um
+                 * nome próprio acima de seis números a 11px era hierarquia
+                 * invertida — o painel dizia "olá" em vez de dizer o estado da
+                 * obra. A saudação é o que fica em baixo, como metadado.
+                 */}
+                <h1 className="text-4xl font-semibold tracking-tight text-graphite">
+                    Situação da obra
                 </h1>
+
                 <p className="text-sm text-graphite-64">
-                    {veTodos
-                        ? 'Administrador: vê todos os projectos, independentemente da aba Acessos.'
-                        : 'Só entram nesta folha os projectos com acesso atribuído.'}{' '}
+                    {nome} · a ver como{' '}
+                    <span className="font-medium text-graphite">{rotuloPerfil(perfil)}</span>.{' '}
                     {total} {total === 1 ? 'linha' : 'linhas'} para ler.
                 </p>
-                <p className="cota normal-case text-graphite-48">
-                    a ver como <span className="text-graphite-64">{rotuloPerfil(perfil)}</span>
+
+                <p className="anotacao normal-case">
+                    {veTodos
+                        ? 'Administrador: vê todos os projectos, independentemente da aba Acessos.'
+                        : 'Só entram nesta folha os projectos com acesso atribuído.'}
                 </p>
             </div>
 
             <div className="w-full space-y-3 sm:w-[420px]">
+                {/* O bloco de título do desenho é a massa escura da folha. Vai
+                    sobre a tábua para ser a primeira coisa em que o olho cai,
+                    e não uma faixa de números a cinzento sobre papel. */}
                 <QuadroMedicoes
                     colunas={2}
+                    superficie="tabua"
                     medicoes={[
                         {
                             rotulo: 'Projectos activos',
@@ -204,11 +218,12 @@ function ZonaCabecalho({
                             rotulo: 'Tarefas atrasadas',
                             valor: String(medicoes.emAtraso),
                             critico: medicoes.emAtraso > 0,
+                            nota: medicoes.emAtraso > 0 ? 'Atraso detectado' : 'Sem atraso',
                         },
                         {
                             rotulo: 'Efectivo presente',
                             valor: String(medicoes.efectivo),
-                            nota: 'último diário de cada',
+                            nota: 'último diário de cada projecto',
                         },
                     ]}
                 />
@@ -221,8 +236,13 @@ function ZonaCabecalho({
                     emitidoEm={dataExtenso(new Date())}
                 />
 
-                <p className="cota text-graphite-48">
-                    {aEspera} {aEspera === 1 ? 'despesa espera' : 'despesas esperam'} aprovação
+                <p className="cota">
+                    {aEspera > 0 && (
+                        <span className="mr-2 inline-block border-2 border-red-pencil bg-red-pencil px-1.5 py-px font-semibold text-paper">
+                            {aEspera} {aEspera === 1 ? 'despesa à espera' : 'despesas à espera'}
+                        </span>
+                    )}
+                    {total} {total === 1 ? 'projecto visível' : 'projectos visíveis'}
                 </p>
             </div>
         </header>
@@ -251,20 +271,23 @@ function ZonaCota({
     alternar: (coluna: Coluna) => void;
 }) {
     return (
-        <section aria-labelledby="cota" className="space-y-3">
-            <div className="flex flex-wrap items-end justify-between gap-3">
-                <h2 id="cota" className="cota">
+        <section aria-labelledby="cota" className="space-y-2">
+            {/* A zona fecha com régua dupla, como o bloco de desenho. Sem ela,
+                as três zonas do painel eram só espaço em branco e o olho não
+                sabia onde um assunto acabava e o seguinte começava. */}
+            <div className="flex flex-wrap items-end justify-between gap-3 border-b border-graphite-32 pb-2">
+                <h2 id="cota" className="cota text-graphite">
                     Projectos · uma linha por folha
                 </h2>
                 {termoActivo && (
-                    <p className="cota flex items-center gap-2 text-graphite-64">
+                    <p className="cota flex items-center gap-2">
                         <span>
                             {linhas.length} de {total} linhas · «{termo.trim()}»
                         </span>
                         <button
                             type="button"
                             onClick={aLimpar}
-                            className="font-sans text-xs text-graphite underline underline-offset-2 hover:text-graphite"
+                            className="font-sans text-xs text-graphite underline underline-offset-2 hover:text-graphite-64"
                         >
                             limpar
                         </button>
@@ -329,11 +352,13 @@ function CabecalhoCota({
                                   }. Premir para inverter.`
                                 : `${coluna.cota}. Premir para ordenar a folha por esta coluna.`
                         }
-                        className={
-                            'flex items-center gap-1 font-mono text-2xs tracking-[0.08em] uppercase ' +
-                            (coluna.alinhamento === 'direita' ? 'justify-end' : 'justify-start') +
-                            (activa ? 'text-graphite' : 'text-graphite-32 hover:text-graphite-64')
-                        }
+                            className={
+                                'flex items-center gap-1 font-mono text-2xs tracking-[0.08em] uppercase ' +
+                                (coluna.alinhamento === 'direita' ? 'justify-end' : 'justify-start') +
+                                (activa
+                                    ? 'text-graphite'
+                                    : 'text-graphite-64 hover:text-graphite')
+                            }
                     >
                         {coluna.cota}
                         {activa && <Icone aria-hidden className="size-3 shrink-0" />}
@@ -361,21 +386,21 @@ function LinhaProjecto({
         <li
             className={cn(
                 GRELHA,
-                'items-baseline gap-x-4 gap-y-2 border-b border-graphite-12 py-3 md:items-center',
+                'items-baseline gap-x-4 gap-y-2 border-b border-graphite-20 py-3 md:items-center',
             )}
         >
-            <span className="cota hidden font-mono text-graphite-48 md:block">{numeroDaFolha}</span>
+            <span className="cota hidden font-mono md:block">{numeroDaFolha}</span>
 
             <div className="min-w-0">
                 <p className="truncate font-medium text-graphite">
-                    <span className="font-mono text-xs text-graphite-48 md:hidden">
+                    <span className="font-mono text-xs text-graphite-64 md:hidden">
                         {numeroDaFolha}{' '}
                     </span>
                     {linha.projecto.nome}
                 </p>
                 <p className="truncate text-xs text-graphite-64">
                     {linha.projecto.cliente}
-                    {papelTexto && <span className="cota ml-2 text-graphite-32">{papelTexto}</span>}
+                    {papelTexto && <span className="cota ml-2">{papelTexto}</span>}
                 </p>
             </div>
 
@@ -423,14 +448,14 @@ function LinhaProjecto({
             <div className="flex items-center justify-between gap-2 md:justify-self-end">
                 <span className="cota md:sr-only">Espera</span>
                 {linha.espera > 0 ? (
-                    <span
-                        title="Despesas à espera de aprovação"
-                        className="border border-graphite px-1.5 font-mono text-xs tabular text-graphite"
-                    >
-                        {linha.espera}
-                    </span>
+                        <span
+                            title="Despesas à espera de aprovação"
+                            className="border-2 border-red-pencil bg-red-pencil px-1.5 font-mono text-xs font-semibold tabular text-paper"
+                        >
+                            {linha.espera}
+                        </span>
                 ) : (
-                    <span aria-hidden className="text-graphite-32">
+                    <span aria-hidden className="text-graphite-64">
                         —
                     </span>
                 )}
@@ -453,10 +478,13 @@ function ZonaGrafico({ linhas }: { linhas: Linha[] }) {
     return (
         <section
             aria-labelledby="comparacao"
-            className="grid gap-8 lg:grid-cols-[minmax(0,1fr)_300px]"
+            className="grid gap-12 lg:grid-cols-[minmax(0,1fr)_300px]"
         >
-            <div className="min-w-0 space-y-3">
-                <h2 id="comparacao" className="cota">
+            <div className="min-w-0 space-y-2">
+                <h2
+                    id="comparacao"
+                    className="cota border-b border-graphite-32 pb-2 text-graphite"
+                >
                     Execuções · as duas barras na mesma escala
                 </h2>
 
@@ -465,21 +493,51 @@ function ZonaGrafico({ linhas }: { linhas: Linha[] }) {
                         Sem linhas para comparar.
                     </p>
                 ) : (
-                    <div className="h-72 border border-graphite-20 bg-paper-raised p-2">
+                    <div className="border border-graphite-32 bg-paper-raised p-3">
                         <BarChart
                             data={dados}
                             layout="vertical"
                             margin={{ top: 4, right: 16, bottom: 4, left: 4 }}
-                            barGap={2}
+                            barGap={3}
+                            barSize={15}
                         >
+                            {/*
+                             * A hachura não é enfeite: é a mesma codificação do
+                             * medidor. Físico sólido é o que está construído, um
+                             * facto; financeiro hachurado é o que está aprovado,
+                             * um cálculo sobre o contrato. Duas barras cinzentas
+                             *chapadas diziam apenas "duas quantidades", e era a
+                             * diferença entre as duas execuções que este painel
+                             * existe para mostrar.
+                             */}
+                            <defs>
+                                <pattern
+                                    id="sgo-hachura-financeira"
+                                    width="5"
+                                    height="5"
+                                    patternUnits="userSpaceOnUse"
+                                    patternTransform="rotate(45)"
+                                >
+                                    <rect width="5" height="5" fill="var(--color-graphite-64)" />
+                                    <line
+                                        x1="0"
+                                        y1="0"
+                                        x2="0"
+                                        y2="5"
+                                        stroke="var(--color-paper-raised)"
+                                        strokeWidth="1.5"
+                                    />
+                                </pattern>
+                            </defs>
+
                             <CartesianGrid horizontal={false} stroke="var(--color-graphite-12)" />
                             <XAxis
                                 type="number"
                                 domain={[0, 100]}
                                 ticks={[0, 25, 50, 75, 100]}
                                 tick={{
-                                    fill: 'var(--color-graphite-48)',
-                                    fontSize: 10,
+                                    fill: 'var(--color-graphite-64)',
+                                    fontSize: 11,
                                 }}
                                 tickLine={false}
                                 axisLine={{
@@ -509,7 +567,7 @@ function ZonaGrafico({ linhas }: { linhas: Linha[] }) {
                             />
                             <Bar
                                 dataKey="financeira"
-                                fill="var(--color-graphite-64)"
+                                fill="url(#sgo-hachura-financeira)"
                                 isAnimationActive={false}
                             />
                         </BarChart>
@@ -517,8 +575,8 @@ function ZonaGrafico({ linhas }: { linhas: Linha[] }) {
                 )}
             </div>
 
-            <div className="space-y-3">
-                <h2 className="cota">Como ler</h2>
+            <div className="space-y-2">
+                <h2 className="cota border-b border-graphite-32 pb-2 text-graphite">Como ler</h2>
                 <dl className="grid gap-px border border-graphite-32 bg-graphite-32">
                     <Explicacao
                         termo="Execução física"
@@ -533,10 +591,11 @@ function ZonaGrafico({ linhas }: { linhas: Linha[] }) {
                         texto="Física menos financeira. Acima de 10 pp o trabalho já foi feito e ainda não foi pago."
                     />
                 </dl>
-                <p className="anotacao normal-case text-graphite-48">
-                    Hachura a 45° nos medidores: o que está medido é sempre derivado de registos,
-                    não um valor escrito à mão. O encerramento administrativo é independente destas
-                    duas execuções e só aparece no detalhe do projecto.
+                <p className="anotacao normal-case">
+                    Hachura a 45° nos medidores e na barra financeira: o que está
+                    medido é sempre derivado de registos, não um valor escrito à
+                    mão. O encerramento administrativo é independente destas duas
+                    execuções e só aparece no detalhe do projecto.
                 </p>
             </div>
         </section>
@@ -558,12 +617,12 @@ function ZonaEspera({ linhas, despesas }: { linhas: Linha[]; despesas: Despesa[]
     const aMostrar = useMemo(() => despesas.slice(0, 5), [despesas]);
 
     return (
-        <section aria-labelledby="espera" className="space-y-3">
-            <div className="flex flex-wrap items-end justify-between gap-3">
-                <h2 id="espera" className="cota">
+        <section aria-labelledby="espera" className="space-y-2">
+            <div className="flex flex-wrap items-end justify-between gap-3 border-b border-graphite-32 pb-2">
+                <h2 id="espera" className="cota text-graphite">
                     À espera de aprovação
                 </h2>
-                <p className="cota text-graphite-48">
+                <p className="cota">
                     {numero(aMostrar.length)} de {numero(despesas.length)} despesas · ordenada por
                     valor
                 </p>
@@ -580,7 +639,7 @@ function ZonaEspera({ linhas, despesas }: { linhas: Linha[]; despesas: Despesa[]
                     Nada à espera de aprovação nesta folha.
                 </p>
             ) : (
-                <ul className="grid gap-px border-x border-b border-graphite-20 bg-graphite-20">
+                <ul className="grid gap-px border-x border-b border-graphite-32 bg-graphite-32">
                     {aMostrar.map((despesa) => {
                         const projecto = estado.projectos.find((p) => p.id === despesa.projectoId);
                         const registadaPor = estado.utilizadores.find(
@@ -601,7 +660,7 @@ function ZonaEspera({ linhas, despesas }: { linhas: Linha[]; despesas: Despesa[]
                                 <span className="font-mono text-sm tabular text-graphite">
                                     {moeda(despesa.valor)}
                                 </span>
-                                <span className="cota text-graphite-48">
+                                <span className="cota">
                                     por {registadaPor?.nome.split(' ')[0] ?? '—'}
                                 </span>
                                 <span>
@@ -613,7 +672,7 @@ function ZonaEspera({ linhas, despesas }: { linhas: Linha[]; despesas: Despesa[]
                 </ul>
             )}
 
-            <p className="cota text-graphite-32">
+            <p className="cota">
                 abrir a despesa e registar o pagamento chegam com o módulo Financeiro
             </p>
 

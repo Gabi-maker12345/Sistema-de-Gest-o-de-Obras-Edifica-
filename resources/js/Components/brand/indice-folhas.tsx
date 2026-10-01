@@ -286,7 +286,10 @@ function ItemFolha({ folha, estreito }: { folha: Folha; estreito: boolean }) {
                 title={`${folha.nome} — ainda não emitido`}
                 className={cn(
                     'flex items-center gap-2 border-l border-dashed border-regua-20 py-1.5 pr-2 pl-2.5',
-                    'text-tinta-32',
+                    // O que falta à frente continua legível, não um fantasma: a
+                    // 14px `tinta-32` dá 2,6:1. É o traço a lápis que diz "ainda
+                    // não", não a cor que o apaga.
+                    'text-tinta-72',
                     estreito && 'justify-center border-l-0 pr-0 pl-0',
                 )}
             >
