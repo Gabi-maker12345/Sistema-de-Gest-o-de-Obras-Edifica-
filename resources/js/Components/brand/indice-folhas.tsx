@@ -31,7 +31,10 @@ type Icone = typeof CalendarDays;
 
 interface Folha {
     nome: string;
-    /** Só o dashboard tem rota; o resto do menu ainda não foi emitido. */
+    /**
+     * Só as folhas emitidas têm rota. `route()` corre no módulo, por isso uma
+     * folha sem rota escreve-se sem `href` e fica a lápis no índice.
+     */
     href?: string;
     icone: Icone;
 }
@@ -64,9 +67,17 @@ const FOLHAS: Array<{ grupo: string; folhas: Folha[] }> = [
     {
         grupo: 'Trabalho',
         folhas: [
-            { nome: 'Projectos', icone: FolderKanban },
+            {
+                nome: 'Projectos',
+                href: route('admin.projectos'),
+                icone: FolderKanban,
+            },
             { nome: 'Actividades', icone: ListOrdered },
-            { nome: 'Equipas', icone: Users },
+            {
+                nome: 'Equipas',
+                href: route('admin.equipas'),
+                icone: Users,
+            },
         ],
     },
     {
@@ -104,8 +115,16 @@ const FOLHAS: Array<{ grupo: string; folhas: Folha[] }> = [
     {
         grupo: 'Sistema',
         folhas: [
-            { nome: 'Utilizadores', icone: UserRound },
-            { nome: 'Áreas', icone: Shapes },
+            {
+                nome: 'Utilizadores',
+                href: route('admin.utilizadores'),
+                icone: UserRound,
+            },
+            {
+                nome: 'Áreas',
+                href: route('admin.areas'),
+                icone: Shapes,
+            },
             { nome: 'Configurações', icone: Settings2 },
         ],
     },

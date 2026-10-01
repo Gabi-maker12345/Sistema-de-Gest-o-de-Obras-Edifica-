@@ -25,8 +25,9 @@ import { rotuloPerfil } from '@/lib/rotulos';
  *
  * A barra é opaca e sem desfocagem — o papel não esbatido por baixo do texto.
  *
- * Só o dashboard está emitido nesta fase; os restantes módulos aparecem no
- * índice a lápis, sem ligação.
+ * Estão emitidos o dashboard e os quatro cadastros base (Projectos, com a sua
+ * ficha, Equipas, Áreas e Utilizadores). Os restantes módulos aparecem no índice
+ * a lápis, sem ligação.
  */
 export function LayoutAdmin({ children }: { children: ReactNode }) {
     const [indiceAberto, definirIndiceAberto] = useState(false);

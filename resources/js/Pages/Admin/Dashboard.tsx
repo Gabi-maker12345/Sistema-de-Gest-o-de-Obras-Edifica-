@@ -7,6 +7,7 @@ import { BlocoTitulo } from '@/Components/brand/bloco-titulo';
 import { Carimbo } from '@/Components/brand/carimbo';
 import { LinhaCota } from '@/Components/brand/linha-cota';
 import { QuadroMedicoes } from '@/Components/brand/quadro-medicoes';
+import { TextoLongo } from '@/Components/brand/texto-longo';
 import { EstadoSelo } from '@/Components/ui/badge';
 import { Medidor } from '@/Components/ui/progress';
 import { useBusca } from '@/Components/brand/contexto-busca';
@@ -386,29 +387,41 @@ function LinhaProjecto({
         <li
             className={cn(
                 GRELHA,
-                'items-baseline gap-x-4 gap-y-2 border-b border-graphite-20 py-3 md:items-center',
+                'items-baseline gap-y-2 border-b border-graphite-20 py-3 md:items-center',
             )}
         >
             <span className="cota hidden font-mono md:block">{numeroDaFolha}</span>
 
             <div className="min-w-0">
-                <p className="truncate font-medium text-graphite">
+                <p className="flex items-baseline font-medium text-graphite">
                     <span className="font-mono text-xs text-graphite-64 md:hidden">
                         {numeroDaFolha}{' '}
                     </span>
-                    {linha.projecto.nome}
+                    <span className="min-w-0 flex-1">
+                        <TextoLongo
+                            texto={linha.projecto.nome}
+                            limite={30}
+                            href={`/admin/projectos/${linha.projecto.id}`}
+                        />
+                    </span>
                 </p>
-                <p className="truncate text-xs text-graphite-64">
-                    {linha.projecto.cliente}
-                    {papelTexto && <span className="cota ml-2">{papelTexto}</span>}
+                <p className="flex items-baseline text-xs text-graphite-64">
+                    <span className="min-w-0 flex-1">
+                        <TextoLongo texto={linha.projecto.cliente} limite={34} />
+                    </span>
+                    {papelTexto && <span className="cota ml-2 shrink-0">{papelTexto}</span>}
                 </p>
             </div>
 
-            <div className="md:justify-self-start">
+            <div className="md:w-full">
                 <EstadoSelo estado={linha.projecto.estadoGeral} />
             </div>
 
-            <div className="flex items-center justify-between gap-2 md:justify-self-end">
+            {/* As três colunas numéricas seguem a mesma regra: `w-full` para a
+                célula não encolher ao conteúdo, `text-right` para o número ter
+                sempre a mesma origem. Sem isto, `+9 pp` e `−2 pp` alinham em
+                sítios diferentes e a coluna parece torta. */}
+            <div className="flex items-center justify-between gap-2 md:w-full md:justify-end">
                 <span className="cota md:sr-only">Fís.</span>
                 <Medidor className="w-full md:w-20" valor={linha.fisica} rotulo="Execução física" />
                 <span className="w-9 shrink-0 text-right font-mono text-xs tabular text-graphite">
@@ -416,7 +429,7 @@ function LinhaProjecto({
                 </span>
             </div>
 
-            <div className="flex items-center justify-between gap-2 md:justify-self-end">
+            <div className="flex items-center justify-between gap-2 md:w-full md:justify-end">
                 <span className="cota md:sr-only">Fin.</span>
                 <Medidor
                     className="w-full md:w-20"
@@ -430,7 +443,7 @@ function LinhaProjecto({
                 </span>
             </div>
 
-            <div className="flex items-center justify-between gap-2 md:justify-self-end">
+            <div className="flex items-center justify-between gap-2 md:w-full md:justify-end">
                 <span className="cota md:sr-only">Desvio</span>
                 <span
                     title="Execução física menos execução financeira"
@@ -445,7 +458,7 @@ function LinhaProjecto({
                 </span>
             </div>
 
-            <div className="flex items-center justify-between gap-2 md:justify-self-end">
+            <div className="flex items-center justify-between gap-2 md:w-full md:justify-end">
                 <span className="cota md:sr-only">Espera</span>
                 {linha.espera > 0 ? (
                         <span
@@ -630,7 +643,7 @@ function ZonaEspera({ linhas, despesas }: { linhas: Linha[]; despesas: Despesa[]
 
             <LinhaCota
                 colunas={['Despesa', 'Projecto', 'Valor', 'Registo', 'Estado']}
-                grelha="grid grid-cols-1 md:grid-cols-[minmax(0,1fr)_minmax(0,1fr)_116px_128px_100px]"
+                grelha="grid grid-cols-1 gap-x-4 md:grid-cols-[minmax(0,1fr)_minmax(0,1fr)_124px_128px_104px]"
                 className="hidden md:grid"
             />
 
@@ -649,7 +662,7 @@ function ZonaEspera({ linhas, despesas }: { linhas: Linha[]; despesas: Despesa[]
                         return (
                             <li
                                 key={despesa.id}
-                                className="grid grid-cols-1 items-baseline gap-x-4 gap-y-1 bg-paper px-3 py-2.5 md:grid-cols-[minmax(0,1fr)_minmax(0,1fr)_116px_128px_100px] md:items-center"
+                                className="grid grid-cols-1 items-baseline gap-x-4 gap-y-1 bg-paper px-3 py-2.5 md:grid-cols-[minmax(0,1fr)_minmax(0,1fr)_124px_128px_104px] md:items-center"
                             >
                                 <span className="truncate text-sm text-graphite">
                                     {despesa.descricao}

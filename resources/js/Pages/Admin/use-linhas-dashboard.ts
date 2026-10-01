@@ -3,7 +3,7 @@ import { useMemo, useState } from 'react';
 import { useBusca } from '@/Components/brand/contexto-busca';
 import { useSgo } from '@/Data/SgoContext';
 import type { Projecto } from '@/Data/types';
-import { folha } from '@/lib/format';
+import { folha, normalizar } from '@/lib/format';
 
 /** As colunas da folha de cotas, na ordem em que são medidas. */
 export type Coluna =
@@ -14,8 +14,15 @@ export type Coluna =
  * uma com a sua cota à esquerda; a partir de `md` cada linha é a própria grelha
  * e cai exactamente por baixo da linha de cota que a mede.
  */
+/**
+ * `gap-x-4` e as restantes medidas vivem aqui e não nas linhas. A cabeça e a
+ * cota recebem esta constante sem acrescentar nada; se as linhas a completassem
+ * com o seu próprio `gap`, cada coluna a partir da segunda começaria um `gap`
+ * mais à direita do que a cota que a mede — e o erro cresce de coluna em
+ * coluna, o que faz a folha parecer torta sem haver nada de torto.
+ */
 export const GRELHA =
-    'grid grid-cols-1 md:grid-cols-[52px_minmax(0,1fr)_104px_132px_132px_64px_56px]';
+    'grid grid-cols-1 gap-x-4 md:grid-cols-[52px_minmax(0,1fr)_104px_140px_140px_72px_60px]';
 
 export const COLUNAS: Array<{
     chave: Coluna;
@@ -42,13 +49,6 @@ export interface Linha {
 }
 
 type Sentido = 'asc' | 'desc';
-
-function normalizar(valor: string): string {
-    return valor
-        .toLowerCase()
-        .normalize('NFD')
-        .replace(/\p{Diacritic}/gu, '');
-}
 
 /**
  * As linhas da folha: um número de executes por projecto, ordenadas pelo maior

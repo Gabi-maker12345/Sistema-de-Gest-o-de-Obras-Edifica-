@@ -6,6 +6,7 @@ import type {
     Actividade,
     Despesa,
     EstadoSgo,
+    MembroEquipa,
     Projecto,
     Utilizador,
 } from '@/Data/types';
@@ -20,11 +21,16 @@ import { temAcessoTotal } from '@/lib/rotulos';
  * para filtrar projectos, sem tocar na sessão real do Breeze.
  */
 
-/** Colecções que aceitam criação, edição e eliminação durante a sessão. */
-export type NomeColeccao = Exclude<
-    keyof EstadoSgo,
-    'utilizadores' | 'acessos' | 'notificacoes' | 'historico'
->;
+/**
+ * Colecções que aceitam criação, edição e eliminação durante a sessão.
+ *
+ * `utilizadores` e `acessos` entram na fase 3 (cadastros base): um utilizador
+ * criado na folha passa a existir no selector «Ver como» e um acesso criado na
+ * aba Acessos passa a filtrar a lista de projectos do perfil que o tem — que é
+ * exactamente o que a aba promete. `notificacoes` e `historico` ficam de fora:
+ * nenhum ecrã os escreve, são leitura.
+ */
+export type NomeColeccao = Exclude<keyof EstadoSgo, 'notificacoes' | 'historico'>;
 
 interface ContextoSgo {
     estado: EstadoSgo;
@@ -60,6 +66,16 @@ interface ContextoSgo {
         alteracoes: Partial<EstadoSgo[N][number]>,
     ) => void;
     eliminar: <N extends NomeColeccao>(coleccao: N, id: string) => void;
+
+    /**
+     * Substitui a lista de membros de uma equipa.
+     *
+     * `membrosEquipa` não é uma colecção de registos com `id`: a chave é o par
+     * equipa/utilizador. Por isso não passa por `actualizar` nem por `eliminar`,
+     * que trabalham por `id`. A equipa continua a ser o registo que se cria e se
+     * corrige; os seus membros entram e saem por aqui.
+     */
+    definirMembros: (equipaId: string, membros: MembroEquipa[]) => void;
 
     /** Marca uma notificação como lida. */
     marcarNotificacaoLida: (id: string) => void;
@@ -199,6 +215,16 @@ export function ProvedorSgo({ children }: { children: ReactNode }) {
         });
     }, []);
 
+    const definirMembros = useCallback((equipaId: string, membros: MembroEquipa[]) => {
+        definirEstado((actual) => ({
+            ...actual,
+            membrosEquipa: [
+                ...actual.membrosEquipa.filter((membro) => membro.equipaId !== equipaId),
+                ...membros.filter((membro) => membro.equipaId === equipaId),
+            ],
+        }));
+    }, []);
+
     const marcarNotificacaoLida = useCallback((id: string) => {
         definirEstado((actual) => ({
             ...actual,
@@ -228,6 +254,7 @@ export function ProvedorSgo({ children }: { children: ReactNode }) {
             criar,
             actualizar,
             eliminar,
+            definirMembros,
             marcarNotificacaoLida,
         }),
         [
@@ -242,6 +269,7 @@ export function ProvedorSgo({ children }: { children: ReactNode }) {
             criar,
             actualizar,
             eliminar,
+            definirMembros,
             marcarNotificacaoLida,
         ],
     );

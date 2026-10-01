@@ -180,6 +180,20 @@ export function iniciais(nome: string): string {
         .join('');
 }
 
+/**
+ * A pesquisa de todas as folhas: minúsculas e sem acentos.
+ *
+ * `Infra-estruturas` tem de encontrar-se por `infra` e por `estrutura`. Sem isto
+ * cada folha escrevia a sua variante e o mesmo utilizador pesquisava de duas
+ * maneiras conforme o módulo onde estava.
+ */
+export function normalizar(texto: string): string {
+    return texto
+        .toLowerCase()
+        .normalize('NFD')
+        .replace(/\p{Diacritic}/gu, '');
+}
+
 /** Número de folha da prancha: `01`, `02`, … */
 export function folha(n: number, total = 8): string {
     return String(n).padStart(2, '0');

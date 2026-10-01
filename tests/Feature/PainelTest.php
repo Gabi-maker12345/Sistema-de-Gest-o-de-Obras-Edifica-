@@ -33,6 +33,62 @@ test('o painel abre a folha do dashboard com sessao', function () {
         ->assertInertia(fn (AssertableInertia $page) => $page->component('Admin/Dashboard'));
 });
 
+/*
+| Os quatro cadastros da fase 3 e o detalhe do projecto. O registo vive em
+| memoria no cliente (D1), por isso a rota so precisa de entregar o
+| identificador a ficha — o teste fixa que a folha certa e que a prop chega.
+*/
+test('os cadastros da fase 3 abrem a folha certa', function (string $rota, string $folha) {
+    $utilizador = User::factory()->create();
+
+    $this->actingAs($utilizador)
+        ->get($rota)
+        ->assertOk()
+        ->assertInertia(fn (AssertableInertia $page) => $page->component($folha));
+})->with([
+    ['/admin/projectos', 'Admin/Projectos'],
+    ['/admin/utilizadores', 'Admin/Utilizadores'],
+    ['/admin/areas', 'Admin/Areas'],
+    ['/admin/equipas', 'Admin/Equipas'],
+]);
+
+test('o detalhe do projecto entrega o identificador a ficha', function () {
+    $utilizador = User::factory()->create();
+
+    $this->actingAs($utilizador)
+        ->get('/admin/projectos/p42')
+        ->assertOk()
+        ->assertInertia(fn (AssertableInertia $page) => $page
+            ->component('Admin/ProjectoDetalhe')
+            ->where('id', 'p42'));
+});
+
+/*
+| A ficha da equipa existe porque os membros vivem nela (spec §303): sao uma
+| tabela de juncao com chave composta e nunca um campo do modal da equipa.
+*/
+test('o detalhe da equipa entrega o identificador a ficha', function () {
+    $utilizador = User::factory()->create();
+
+    $this->actingAs($utilizador)
+        ->get('/admin/equipas/eq7')
+        ->assertOk()
+        ->assertInertia(fn (AssertableInertia $page) => $page
+            ->component('Admin/EquipaDetalhe')
+            ->where('id', 'eq7'));
+});
+
+test('os cadastros da fase 3 exigem sessao', function (string $rota) {
+    $this->get($rota)->assertRedirect('/login');
+})->with([
+    '/admin/projectos',
+    '/admin/projectos/p1',
+    '/admin/utilizadores',
+    '/admin/areas',
+    '/admin/equipas',
+    '/admin/equipas/eq1',
+]);
+
 test('a resposta e em portugues de Portugal', function () {
     $this->get('/')->assertOk()->assertSee('lang="pt-PT"', false);
 });

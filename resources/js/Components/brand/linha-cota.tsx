@@ -18,14 +18,24 @@ export function LinhaCota({
 }) {
     return (
         <div aria-hidden className={cn(grelha, className)}>
-            {colunas.map((coluna) => (
+            {colunas.map((coluna, indice) => (
                 <div
-                    key={coluna}
-                    className="relative border-t border-graphite-32 pt-1 pr-2 last:pr-0"
+                    key={`${coluna}-${indice}`}
+                    className={cn(
+                        'relative min-w-0 pr-2 last:pr-0',
+                        // Uma coluna sem cota — a das acções por linha — não recebe
+                        // traços de extremo: a cota mede, e uma cota vazia não
+                        // mede nada.
+                        coluna && 'border-t border-graphite-32 pt-1',
+                    )}
                 >
-                    <span className="absolute -top-[3px] left-0 h-[6px] w-px bg-graphite-32" />
-                    <span className="absolute -top-[3px] right-0 h-[6px] w-px bg-graphite-32" />
-                    <span className="cota block truncate">{coluna}</span>
+                    {coluna && (
+                        <>
+                            <span className="absolute -top-[3px] left-0 h-[6px] w-px bg-graphite-32" />
+                            <span className="absolute -top-[3px] right-0 h-[6px] w-px bg-graphite-32" />
+                            <span className="cota block truncate">{coluna}</span>
+                        </>
+                    )}
                 </div>
             ))}
         </div>
