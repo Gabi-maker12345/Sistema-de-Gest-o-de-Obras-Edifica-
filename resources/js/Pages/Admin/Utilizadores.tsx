@@ -271,7 +271,10 @@ interface Linha {
  * A grelha e as colunas vivem aqui porque a linha e a cabeça têm de medir a
  * mesma coisa — é a mesma regra que o painel segue com `COLUNAS` e `GRELHA`.
  */
-const GRELHA = `${GRELHA_REGISTOS} md:grid-cols-[minmax(0,1.4fr)_140px_minmax(0,1fr)_112px_124px_40px]`;
+// A última coluna é o selo de estado mais o lápis. A 40px só cabia o lápis, e o
+// selo saía 49px da célula e caía em cima da linha seguinte. 104px é o que o
+// selo "Inactivo" mede com o nome ao lado.
+const GRELHA = `${GRELHA_REGISTOS} md:grid-cols-[minmax(0,1.4fr)_140px_minmax(0,1fr)_minmax(0,1fr)_124px_104px]`;
 
 const COLUNAS = [
     { chave: 'nome', cota: 'Utilizador', valor: (linha: Linha) => linha.utilizador.nome },
@@ -319,9 +322,9 @@ function LinhaUtilizador({ linha, aoEditar }: { linha: Linha; aoEditar: () => vo
                 </p>
             </div>
 
-            {/* «Fiscal/Responsável de Obra» é o caso que fez falta: 27
-                caracteres que a coluna de 140px não mostrava e que ninguém
-                podia recuperar. Acima do limite, a célula passa a abrir janela. */}
+            {/* «Fiscal/Responsável de Obra» foi o caso que primeiro mostrou o problema:
+                26 caracteres numa coluna estreita. Não abre janela — é curto
+                demais para isso — mas é cortado, por isso leva a pista. */}
             <div className="min-w-0 text-sm text-graphite">
                 <TextoLongo texto={rotuloPerfil(utilizador.perfil)} />
             </div>
@@ -330,13 +333,17 @@ function LinhaUtilizador({ linha, aoEditar }: { linha: Linha; aoEditar: () => vo
                 <TextoLongo texto={utilizador.cargo ?? ''} />
             </div>
 
+            {/* O email é mais largo que a coluna e o telefone fica ao lado. Sem
+                `flex-1` no email, o flex dá-lhe a largura que o conteúdo pede e o
+                telefone sai da célula — era o email a cair em cima da linha
+                seguinte. O telefone encolhe; o email é que cede. */}
             <div className="min-w-0 text-sm text-graphite-64">
                 <p className="flex min-w-0 items-baseline gap-2">
-                    <span className="min-w-0">
+                    <span className="min-w-0 flex-1">
                         <TextoLongo texto={utilizador.email} className="font-mono text-xs" />
                     </span>
                     {utilizador.telefone && (
-                        <span className="cota shrink-0">{utilizador.telefone}</span>
+                        <span className="cota min-w-0 shrink truncate">{utilizador.telefone}</span>
                     )}
                 </p>
             </div>
@@ -353,7 +360,11 @@ function LinhaUtilizador({ linha, aoEditar }: { linha: Linha; aoEditar: () => vo
                 />
             </div>
 
-            <div className="flex items-center justify-between gap-2 md:w-full md:justify-end">
+            {/* O selo e o lápis dividem a célula. `justify-between` sem `shrink-0` dá ao
+                selo a largura do conteúdo e empurra o lápis para fora — o texto
+                saía 49px da célula. O selo fica com a largura que precisa, o
+                lápis encosta à direita. */}
+            <div className="flex min-w-0 items-center justify-end gap-2 md:w-full">
                 <Selo
                     tinta="grafite"
                     traco={inactivo ? 'pontilhado' : 'medio'}

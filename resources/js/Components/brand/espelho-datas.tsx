@@ -1,5 +1,5 @@
 import { Link } from '@inertiajs/react';
-import type { ReactNode } from 'react';
+import { useCallback, useMemo, useState, type ReactNode } from 'react';
 
 import { EstadoSelo } from '@/Components/ui/badge';
 import { data } from '@/lib/format';
@@ -74,15 +74,38 @@ export function EspelhoDeDatas({
     );
 }
 
+/** A largura de uma etiqueta de mês da régua, em pixéis. */
+const LARGURA_ETIQUETA = 34;
+
 /** A régua dos meses, com a de hoje a atravessá-la. */
 function Eixo({ casa, referencia }: { casa: Dominio; referencia: Date }) {
     const hojeX = reguaDeHoje(casa, referencia);
+    const [trilho, medirTrilho] = useMedir();
+
+    // A etiqueta é posicionada em percentagem do trilho, mas a largura dela é
+    // fixa em pixéis. As duas coisas só concordam enquanto os meses ficam
+    // longe uns dos outros — e decidir isso por `indice % 2` assumia um
+    // espaçamento uniforme que o ecrã estreito deixa de ter. Com a largura real
+    // do trilho, cada mês pergunta se ainda há espaço até ao vizinho.
+    const cabem = useMemo(
+        () => cabemOsMeses(casa, trilho),
+        [casa, trilho],
+    );
 
     return (
         <div className={cn(GRELHA, 'border-b border-graphite-32 pb-2')}>
             <p className="cota text-graphite">Projecto · uma linha por obra</p>
 
-            <div className="relative h-7">
+            <div className="flex items-baseline justify-between gap-2">
+                {/* O ano fica na linha da cota, fora do trilho. Dentro do trilho
+                    ficava a 28px do primeiro mês e batia-lhe, porque o trilho
+                    começa na margem esquerda da grelha e não da etiqueta. */}
+                <p className="cota text-graphite-48">{casa.de.getFullYear()}</p>
+                <p className="cota text-graphite-48">{casa.meses.length} meses em obra</p>
+            </div>
+
+            <div className="relative h-7" ref={medirTrilho}>
+
                 {casa.meses.map((mes, indice) => (
                     <div
                         key={mes.de.toISOString()}
@@ -91,15 +114,10 @@ function Eixo({ casa, referencia }: { casa: Dominio; referencia: Date }) {
                     >
                         <span aria-hidden className="absolute top-0 h-2 w-px bg-graphite-32" />
                         <span
-                            className={cn(
-                                'cota absolute top-2.5 whitespace-nowrap',
-                                indice % 2 === 1 && 'hidden lg:block',
-                            )}
+                            className="cota absolute top-2.5 whitespace-nowrap"
+                            hidden={!cabem[indice]}
                         >
                             {mes.rotulo} {numeroDoMes(mes.de)}
-                            {indice === 0 && (
-                                <span className="ml-1">{casa.de.getFullYear()}</span>
-                            )}
                         </span>
                     </div>
                 ))}
@@ -122,6 +140,60 @@ function Eixo({ casa, referencia }: { casa: Dominio; referencia: Date }) {
             </div>
         </div>
     );
+}
+
+/** A largura do trilho das datas, em pixéis, reavaliada quando muda. */
+function useMedir() {
+    const [largura, definirLargura] = useState(0);
+
+    const medir = useCallback((el: HTMLDivElement | null) => {
+        if (!el) {
+            return;
+        }
+
+        const observacao = new ResizeObserver(([entrada]) => {
+            definirLargura(Math.round(entrada.contentRect.width));
+        });
+
+        observacao.observe(el);
+    }, []);
+
+    return [largura, medir] as const;
+}
+
+/**
+ * Que meses da régua cabem, sem se sobreporem.
+ *
+ * A etiqueta «fev 2» mede ~28px. Só entra se o espaço até ao mês seguinte for
+ * maior do que isso; caso contrário é omitida e fica o traço, que sozinho já
+ * marca a posição. Preferimos uma régua com menos nomes a uma régua em que os
+ * nomes se atravessam — o traço continua a dizer quando é, o nome ilegível não
+ * diz nada.
+ */
+function cabemOsMeses(casa: Dominio, trilho: number) {
+    const cabem = casa.meses.map(() => true);
+
+    if (trilho === 0) {
+        return cabem;
+    }
+
+    for (let i = 1; i < casa.meses.length; i++) {
+        const distancia =
+            ((posicao(casa.meses[i].de, casa) - posicao(casa.meses[i - 1].de, casa)) / 100) *
+            trilho;
+
+        if (distancia < LARGURA_ETIQUETA) {
+            cabem[i - 1] = false;
+            cabem[i] = false;
+        }
+    }
+
+    // O primeiro e o último nunca são omitidos: são as pontas da régua, e é
+    // eles que dizem onde a obra começa e onde acaba.
+    cabem[0] = true;
+    cabem[cabem.length - 1] = true;
+
+    return cabem;
 }
 
 function Linha({
