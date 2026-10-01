@@ -1,4 +1,4 @@
-import { Head } from '@inertiajs/react';
+﻿import { Head } from '@inertiajs/react';
 import { Pencil, Plus } from 'lucide-react';
 import { useMemo, useState } from 'react';
 
@@ -10,6 +10,7 @@ import { FiltroChip, FiltrosFolha } from '@/Components/brand/filtros-folha';
 import { FolhaRegistos } from '@/Components/brand/folha-registos';
 import { ListaColuna } from '@/Components/brand/lista-coluna';
 import { TextoLongo } from '@/Components/brand/texto-longo';
+import { ComDica } from '@/Components/ui/dica';
 import { Selo } from '@/Components/ui/badge';
 import { Botao } from '@/Components/ui/button';
 import { useSgo } from '@/Data/SgoContext';
@@ -292,11 +293,11 @@ function LinhaArea({ linha, aoEditar }: { linha: Linha; aoEditar: () => void }) 
         <div className={cn(GRELHA, projectos === 0 && 'bg-paper-sunken/60')}>
             <div className="min-w-0">
                 <p className="font-medium text-graphite">
-                    <TextoLongo texto={area.nome} limite={28} />
+                    <TextoLongo texto={area.nome} />
                 </p>
                 {area.descricao && (
                     <p className="text-xs text-graphite-64 md:hidden">
-                        <TextoLongo texto={area.descricao} limite={40} />
+                        <TextoLongo texto={area.descricao} />
                     </p>
                 )}
             </div>
@@ -316,7 +317,7 @@ function LinhaArea({ linha, aoEditar }: { linha: Linha; aoEditar: () => void }) 
                                 responsavel.activo ? 'text-graphite' : 'text-graphite-48',
                             )}
                         >
-                            <TextoLongo texto={responsavel.nome} limite={24} />
+                            <TextoLongo texto={responsavel.nome} />
                         </span>
                         {!responsavel.activo && (
                             <Selo tinta="grafite" traco="pontilhado" title="Responsável inactivo">
@@ -335,7 +336,7 @@ function LinhaArea({ linha, aoEditar }: { linha: Linha; aoEditar: () => void }) 
             </div>
 
             <p className="min-w-0 text-sm text-graphite-64">
-                <TextoLongo texto={area.descricao ?? ''} limite={34} />
+                <TextoLongo texto={area.descricao ?? ''} />
             </p>
 
             {/* Ver `ListaColuna`: a coluna fica com origem fixa e as frentes
@@ -349,15 +350,16 @@ function LinhaArea({ linha, aoEditar }: { linha: Linha; aoEditar: () => void }) 
             </div>
 
             <div className="flex justify-end md:w-full md:justify-end">
-                <button
-                    type="button"
-                    onClick={aoEditar}
-                    title={`Corrigir ${area.nome}`}
-                    className="grid size-8 shrink-0 place-items-center border border-graphite-32 text-graphite-64 transition-colors hover:border-graphite hover:bg-graphite-04 hover:text-graphite focus-visible:border-amber focus-visible:ring-1 focus-visible:ring-amber focus-visible:outline-none"
-                >
-                    <Pencil aria-hidden className="size-3.5" />
-                    <span className="sr-only">Corrigir {area.nome}</span>
-                </button>
+                <ComDica texto={`Corrigir ${area.nome}`}>
+                    <button
+                        type="button"
+                        onClick={aoEditar}
+                        className="grid size-8 shrink-0 place-items-center border border-graphite-32 text-graphite-64 transition-colors hover:border-graphite hover:bg-graphite-04 hover:text-graphite focus-visible:border-amber focus-visible:ring-1 focus-visible:ring-amber focus-visible:outline-none"
+                    >
+                        <Pencil aria-hidden className="size-3.5" />
+                        <span className="sr-only">Corrigir {area.nome}</span>
+                    </button>
+                </ComDica>
             </div>
         </div>
     );

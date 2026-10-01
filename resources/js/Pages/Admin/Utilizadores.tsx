@@ -1,4 +1,4 @@
-import { Head } from '@inertiajs/react';
+﻿import { Head } from '@inertiajs/react';
 import { Pencil, Plus } from 'lucide-react';
 import { useMemo, useState } from 'react';
 
@@ -10,6 +10,7 @@ import { FiltroChip, FiltrosFolha } from '@/Components/brand/filtros-folha';
 import { FolhaRegistos } from '@/Components/brand/folha-registos';
 import { ListaColuna } from '@/Components/brand/lista-coluna';
 import { TextoLongo } from '@/Components/brand/texto-longo';
+import { ComDica } from '@/Components/ui/dica';
 import { Botao } from '@/Components/ui/button';
 import { Selo } from '@/Components/ui/badge';
 import { useSgo } from '@/Data/SgoContext';
@@ -313,7 +314,7 @@ function LinhaUtilizador({ linha, aoEditar }: { linha: Linha; aoEditar: () => vo
                         {iniciais(utilizador.nome)}
                     </span>
                     <span className="min-w-0">
-                        <TextoLongo texto={utilizador.nome} limite={28} />
+                        <TextoLongo texto={utilizador.nome} />
                     </span>
                 </p>
             </div>
@@ -322,17 +323,17 @@ function LinhaUtilizador({ linha, aoEditar }: { linha: Linha; aoEditar: () => vo
                 caracteres que a coluna de 140px não mostrava e que ninguém
                 podia recuperar. Acima do limite, a célula passa a abrir janela. */}
             <div className="min-w-0 text-sm text-graphite">
-                <TextoLongo texto={rotuloPerfil(utilizador.perfil)} limite={24} />
+                <TextoLongo texto={rotuloPerfil(utilizador.perfil)} />
             </div>
 
             <div className="min-w-0 text-sm text-graphite-64">
-                <TextoLongo texto={utilizador.cargo ?? ''} limite={24} />
+                <TextoLongo texto={utilizador.cargo ?? ''} />
             </div>
 
             <div className="min-w-0 text-sm text-graphite-64">
                 <p className="flex min-w-0 items-baseline gap-2">
                     <span className="min-w-0">
-                        <TextoLongo texto={utilizador.email} limite={28} className="font-mono text-xs" />
+                        <TextoLongo texto={utilizador.email} className="font-mono text-xs" />
                     </span>
                     {utilizador.telefone && (
                         <span className="cota shrink-0">{utilizador.telefone}</span>
@@ -361,15 +362,16 @@ function LinhaUtilizador({ linha, aoEditar }: { linha: Linha; aoEditar: () => vo
                     {inactivo ? 'Inactivo' : 'Activo'}
                 </Selo>
 
-                <button
-                    type="button"
-                    onClick={aoEditar}
-                    title={`Corrigir ${utilizador.nome}`}
-                    className="grid size-8 shrink-0 place-items-center border border-graphite-32 text-graphite-64 transition-colors hover:border-graphite hover:bg-graphite-04 hover:text-graphite focus-visible:border-amber focus-visible:ring-1 focus-visible:ring-amber focus-visible:outline-none"
-                >
-                    <Pencil aria-hidden className="size-3.5" />
-                    <span className="sr-only">Corrigir {utilizador.nome}</span>
-                </button>
+                <ComDica texto={`Corrigir ${utilizador.nome}`}>
+                    <button
+                        type="button"
+                        onClick={aoEditar}
+                        className="grid size-8 shrink-0 place-items-center border border-graphite-32 text-graphite-64 transition-colors hover:border-graphite hover:bg-graphite-04 hover:text-graphite focus-visible:border-amber focus-visible:ring-1 focus-visible:ring-amber focus-visible:outline-none"
+                    >
+                        <Pencil aria-hidden className="size-3.5" />
+                        <span className="sr-only">Corrigir {utilizador.nome}</span>
+                    </button>
+                </ComDica>
             </div>
         </div>
     );

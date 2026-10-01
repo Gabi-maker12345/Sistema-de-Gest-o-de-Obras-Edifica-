@@ -7,6 +7,7 @@ import { Botao } from '@/Components/ui/button';
 import { EstadoSelo, Selo } from '@/Components/ui/badge';
 import { Folha, FolhaCabecalho, FolhaCorpo, FolhaRodape } from '@/Components/ui/card';
 import { Confirmacao } from '@/Components/ui/confirmacao';
+import { ComDica } from '@/Components/ui/dica';
 import { Interruptor } from '@/Components/ui/switch';
 import { Medidor } from '@/Components/ui/progress';
 import {
@@ -510,16 +511,20 @@ function FolhaAcessos({
                                             </SeletorConteudo>
                                         </Seletor>
 
-                                        <button
-                                            type="button"
-                                            onClick={() => definirARetirar(acesso)}
-                                            className="grid size-8 shrink-0 place-items-center border border-graphite-32 text-graphite-64 transition-colors hover:border-red-pencil hover:text-red-pencil focus-visible:border-amber focus-visible:ring-1 focus-visible:ring-amber focus-visible:outline-none"
+                                        <ComDica
+                                            texto={`Retirar ${pessoa?.nome ?? 'esta pessoa'} desta obra`}
                                         >
-                                            <X aria-hidden className="size-3.5" />
-                                            <span className="sr-only">
-                                                Retirar {pessoa?.nome ?? 'esta pessoa'} desta obra
-                                            </span>
-                                        </button>
+                                            <button
+                                                type="button"
+                                                onClick={() => definirARetirar(acesso)}
+                                                className="grid size-8 shrink-0 place-items-center border border-graphite-32 text-graphite-64 transition-colors hover:border-red-pencil hover:text-red-pencil focus-visible:border-amber focus-visible:ring-1 focus-visible:ring-amber focus-visible:outline-none"
+                                            >
+                                                <X aria-hidden className="size-3.5" />
+                                                <span className="sr-only">
+                                                    Retirar {pessoa?.nome ?? 'esta pessoa'} desta obra
+                                                </span>
+                                            </button>
+                                        </ComDica>
                                     </>
                                 ) : (
                                     <Selo tinta="neutro" traco="medio">

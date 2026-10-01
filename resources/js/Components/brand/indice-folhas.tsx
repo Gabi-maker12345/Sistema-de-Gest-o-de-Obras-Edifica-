@@ -24,6 +24,7 @@ import {
 import { useEffect, useState } from 'react';
 
 import { cn } from '@/lib/utils';
+import { ComDica } from '@/Components/ui/dica';
 
 import { useEstacaoActiva } from './link-estacao';
 
@@ -184,18 +185,20 @@ export function IndiceFolhas({ andarinho = false }: { andarinho?: boolean }) {
             </div>
 
             {!andarinho && (
-                <button
-                    type="button"
-                    onClick={() => definirRecolhida(!recolhida)}
-                    aria-expanded={!recolhida}
-                    className={cn(
-                        'cota-t sticky bottom-0 flex items-center gap-2 border-t border-regua-12',
-                        'bg-tabua px-3 py-2.5 transition-colors hover:bg-placa hover:text-tinta',
-                    )}
-                >
-                    {recolhida ? '›' : '‹'}
-                    {!recolhida && <span>Recolher índice</span>}
-                </button>
+                <ComDica texto={recolhida ? 'Abrir índice de folhas' : 'Recolher índice'}>
+                    <button
+                        type="button"
+                        onClick={() => definirRecolhida(!recolhida)}
+                        aria-expanded={!recolhida}
+                        className={cn(
+                            'cota-t sticky bottom-0 flex items-center gap-2 border-t border-regua-12',
+                            'bg-tabua px-3 py-2.5 transition-colors hover:bg-placa hover:text-tinta',
+                        )}
+                    >
+                        {recolhida ? '›' : '‹'}
+                        {!recolhida && <span>Recolher índice</span>}
+                    </button>
+                </ComDica>
             )}
         </nav>
     );
@@ -236,14 +239,16 @@ function SeparadorPasta({ nome }: { nome: string }) {
 /** O botão que fecha o índice no ecrã pequeno; vive dentro do painel. */
 function BotaoFechar() {
     return (
-        <button
-            type="button"
-            onClick={() => document.dispatchEvent(new CustomEvent('sgo:fechar-indice'))}
-            className="grid size-8 place-items-center text-tinta-72 transition-colors hover:bg-placa hover:text-tinta"
-        >
-            <X aria-hidden className="size-4" />
-            <span className="sr-only">Fechar índice de folhas</span>
-        </button>
+<ComDica texto="Fechar índice de folhas">
+                        <button
+                            type="button"
+                            onClick={() => document.dispatchEvent(new CustomEvent('sgo:fechar-indice'))}
+                            className="grid size-8 place-items-center text-tinta-72 transition-colors hover:bg-placa hover:text-tinta"
+                        >
+                            <X aria-hidden className="size-4" />
+                            <span className="sr-only">Fechar índice de folhas</span>
+                        </button>
+                    </ComDica>
     );
 }
 

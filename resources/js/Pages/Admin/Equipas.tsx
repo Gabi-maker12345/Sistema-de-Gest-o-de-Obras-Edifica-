@@ -1,4 +1,4 @@
-import { Head, Link } from '@inertiajs/react';
+﻿import { Head, Link } from '@inertiajs/react';
 import { Pencil, Plus } from 'lucide-react';
 import { useMemo, useState } from 'react';
 
@@ -10,6 +10,7 @@ import { FiltroChip, FiltrosFolha } from '@/Components/brand/filtros-folha';
 import { FolhaRegistos } from '@/Components/brand/folha-registos';
 import { NumeroComDetalhe } from '@/Components/brand/lista-coluna';
 import { TextoLongo } from '@/Components/brand/texto-longo';
+import { ComDica } from '@/Components/ui/dica';
 import { Selo } from '@/Components/ui/badge';
 import { Botao } from '@/Components/ui/button';
 import { useSgo } from '@/Data/SgoContext';
@@ -342,7 +343,6 @@ function LinhaEquipa({ linha, aoEditar }: { linha: Linha; aoEditar: () => void }
                     o que faz. */}
                 <TextoLongo
                     texto={equipa.nome}
-                    limite={28}
                     href={`/admin/equipas/${equipa.id}`}
                     className="font-medium text-graphite"
                 />
@@ -351,7 +351,7 @@ function LinhaEquipa({ linha, aoEditar }: { linha: Linha; aoEditar: () => void }
             <div className="min-w-0">
                 {projecto ? (
                     <p className="text-sm text-graphite">
-                        <TextoLongo texto={projecto.nome} limite={26} />
+                        <TextoLongo texto={projecto.nome} />
                     </p>
                 ) : (
                     // Uma equipa sem obra não é um erro de escrita, é uma equipa
@@ -364,7 +364,7 @@ function LinhaEquipa({ linha, aoEditar }: { linha: Linha; aoEditar: () => void }
             </div>
 
             <p className="min-w-0 text-sm text-graphite-64">
-                <TextoLongo texto={equipa.especialidade ?? ''} limite={24} />
+                <TextoLongo texto={equipa.especialidade ?? ''} />
             </p>
 
             {/* `w-full` + `text-right` para a origem do número não depender do
@@ -399,15 +399,16 @@ function LinhaEquipa({ linha, aoEditar }: { linha: Linha; aoEditar: () => void }
             </div>
 
             <div className="flex justify-end md:w-full md:justify-end">
-                <button
-                    type="button"
-                    onClick={aoEditar}
-                    title={`Corrigir ${equipa.nome}`}
-                    className="grid size-8 shrink-0 place-items-center border border-graphite-32 text-graphite-64 transition-colors hover:border-graphite hover:bg-graphite-04 hover:text-graphite focus-visible:border-amber focus-visible:ring-1 focus-visible:ring-amber focus-visible:outline-none"
-                >
-                    <Pencil aria-hidden className="size-3.5" />
-                    <span className="sr-only">Corrigir {equipa.nome}</span>
-                </button>
+                <ComDica texto={`Corrigir ${equipa.nome}`}>
+                    <button
+                        type="button"
+                        onClick={aoEditar}
+                        className="grid size-8 shrink-0 place-items-center border border-graphite-32 text-graphite-64 transition-colors hover:border-graphite hover:bg-graphite-04 hover:text-graphite focus-visible:border-amber focus-visible:ring-1 focus-visible:ring-amber focus-visible:outline-none"
+                    >
+                        <Pencil aria-hidden className="size-3.5" />
+                        <span className="sr-only">Corrigir {equipa.nome}</span>
+                    </button>
+                </ComDica>
             </div>
         </div>
     );

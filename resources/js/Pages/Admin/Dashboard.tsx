@@ -1,4 +1,4 @@
-import { Head } from '@inertiajs/react';
+﻿import { Head } from '@inertiajs/react';
 import { ArrowDown, ArrowUp } from 'lucide-react';
 import { useMemo } from 'react';
 import { Bar, BarChart, CartesianGrid, ReferenceLine, XAxis, YAxis } from 'recharts';
@@ -6,6 +6,7 @@ import { Bar, BarChart, CartesianGrid, ReferenceLine, XAxis, YAxis } from 'recha
 import { BlocoTitulo } from '@/Components/brand/bloco-titulo';
 import { Carimbo } from '@/Components/brand/carimbo';
 import { LinhaCota } from '@/Components/brand/linha-cota';
+import { CabecalhoCota as CabecalhoCotaPartilhado } from '@/Components/brand/cabecalho-cota';
 import { QuadroMedicoes } from '@/Components/brand/quadro-medicoes';
 import { TextoLongo } from '@/Components/brand/texto-longo';
 import { EstadoSelo } from '@/Components/ui/badge';
@@ -335,38 +336,16 @@ function CabecalhoCota({
     ordem: { coluna: Coluna; sentido: 'asc' | 'desc' };
     alternar: (coluna: Coluna) => void;
 }) {
+    // Uma única implementação de ordenação em todo o produto: a pista de hover
+    // e o `aria-label` estavam a ser mantidos à mão em dois sítios, e divergiram.
     return (
-        <div className={`${GRELHA} hidden border-b border-graphite-20 pb-1.5 md:grid`}>
-            {COLUNAS.map((coluna) => {
-                const activa = ordem.coluna === coluna.chave;
-                const Icone = !activa ? ArrowDown : ordem.sentido === 'asc' ? ArrowUp : ArrowDown;
-
-                return (
-                    <button
-                        key={coluna.chave}
-                        type="button"
-                        onClick={() => alternar(coluna.chave)}
-                        aria-label={
-                            activa
-                                ? `${coluna.cota}. Folha ordenada por ${coluna.cota}, ${
-                                      ordem.sentido === 'asc' ? 'crescente' : 'decrescente'
-                                  }. Premir para inverter.`
-                                : `${coluna.cota}. Premir para ordenar a folha por esta coluna.`
-                        }
-                            className={
-                                'flex items-center gap-1 font-mono text-2xs tracking-[0.08em] uppercase ' +
-                                (coluna.alinhamento === 'direita' ? 'justify-end' : 'justify-start') +
-                                (activa
-                                    ? 'text-graphite'
-                                    : 'text-graphite-64 hover:text-graphite')
-                            }
-                    >
-                        {coluna.cota}
-                        {activa && <Icone aria-hidden className="size-3 shrink-0" />}
-                    </button>
-                );
-            })}
-        </div>
+        <CabecalhoCotaPartilhado
+            colunas={COLUNAS}
+            ordem={ordem}
+            alternar={(chave) => alternar(chave as Coluna)}
+            grelha={GRELHA}
+            className="hidden md:grid"
+        />
     );
 }
 
@@ -400,14 +379,13 @@ function LinhaProjecto({
                     <span className="min-w-0 flex-1">
                         <TextoLongo
                             texto={linha.projecto.nome}
-                            limite={30}
                             href={`/admin/projectos/${linha.projecto.id}`}
                         />
                     </span>
                 </p>
                 <p className="flex items-baseline text-xs text-graphite-64">
                     <span className="min-w-0 flex-1">
-                        <TextoLongo texto={linha.projecto.cliente} limite={34} />
+                        <TextoLongo texto={linha.projecto.cliente} />
                     </span>
                     {papelTexto && <span className="cota ml-2 shrink-0">{papelTexto}</span>}
                 </p>

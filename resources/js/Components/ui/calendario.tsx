@@ -7,6 +7,7 @@ import { dataLocal } from '@/lib/espelho';
 import { cn } from '@/lib/utils';
 
 import { Bolha, BolhaConteudo } from './popover';
+import { ComDica } from './dica';
 
 /**
  * O calendário: um mês desenhado como a grade de um gabarito.
@@ -172,27 +173,31 @@ export function Calendario({
 
             <BolhaConteudo align="start" className="w-72 p-0" onKeyDown={aoTeclar}>
                 <div className="flex items-center justify-between border-b border-graphite-12 px-2 py-2">
-                    <button
-                        type="button"
-                        onClick={() => definirFoco((actual) => deslocarMes(actual, -1))}
-                        className="grid size-7 place-items-center text-graphite-64 transition-colors hover:bg-graphite-08 hover:text-graphite"
-                    >
-                        <ChevronLeft aria-hidden className="size-4" />
-                        <span className="sr-only">Mês anterior</span>
-                    </button>
+<ComDica texto="Mês anterior">
+                <button
+                    type="button"
+                    onClick={() => definirFoco((actual) => deslocarMes(actual, -1))}
+                    className="grid size-7 place-items-center text-graphite-64 transition-colors hover:bg-graphite-08 hover:text-graphite"
+                >
+                    <ChevronLeft aria-hidden className="size-4" />
+                    <span className="sr-only">Mês anterior</span>
+                </button>
+            </ComDica>
 
                     <p aria-live="polite" className="cota text-graphite">
                         {MESES.format(mesActual)}
                     </p>
 
-                    <button
-                        type="button"
-                        onClick={() => definirFoco((actual) => deslocarMes(actual, 1))}
-                        className="grid size-7 place-items-center text-graphite-64 transition-colors hover:bg-graphite-08 hover:text-graphite"
-                    >
-                        <ChevronRight aria-hidden className="size-4" />
-                        <span className="sr-only">Mês seguinte</span>
-                    </button>
+<ComDica texto="Mês seguinte">
+                <button
+                    type="button"
+                    onClick={() => definirFoco((actual) => deslocarMes(actual, 1))}
+                    className="grid size-7 place-items-center text-graphite-64 transition-colors hover:bg-graphite-08 hover:text-graphite"
+                >
+                    <ChevronRight aria-hidden className="size-4" />
+                    <span className="sr-only">Mês seguinte</span>
+                </button>
+            </ComDica>
                 </div>
 
                 <div className="px-2 py-2">

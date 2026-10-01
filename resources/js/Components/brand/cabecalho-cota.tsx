@@ -2,6 +2,7 @@ import { ArrowDown, ArrowUp } from 'lucide-react';
 import { useCallback, useMemo, useState } from 'react';
 
 import { cn } from '@/lib/utils';
+import { ComDica } from '@/Components/ui/dica';
 
 /**
  * A cabeça da folha de cota: as colunas que a linha de cota mede, e que aqui
@@ -16,7 +17,12 @@ export interface ColunaOrdenavel<L> {
     chave: string;
     cota: string;
     alinhamento?: 'direita';
-    valor: (linha: L) => number | string;
+    /**
+     * Só é preciso quando a folha usa `useOrdem` e ordena os dados. Uma folha que
+     * chega ao ecrã já ordenada por outro sítio — o painel, por exemplo — só
+     * precisa da cota para a desenhar e do nome para a ordenação invertida.
+     */
+    valor?: (linha: L) => number | string;
 }
 
 export type Ordem = { coluna: string; sentido: 'asc' | 'desc' };
@@ -41,15 +47,15 @@ export function useOrdem<L>(colunas: Array<ColunaOrdenavel<L>>, inicial: string)
         <T extends L>(linhas: T[]): T[] => {
             const coluna = colunas.find((c) => c.chave === ordem.coluna);
 
-            if (!coluna) {
+            if (!coluna?.valor) {
                 return linhas;
             }
 
             const direccao = ordem.sentido === 'asc' ? 1 : -1;
 
             return [...linhas].sort((a, b) => {
-                const va = coluna.valor(a);
-                const vb = coluna.valor(b);
+                const va = coluna.valor!(a);
+                const vb = coluna.valor!(b);
 
                 if (typeof va === 'number' && typeof vb === 'number') {
                     return (va - vb) * direccao;
@@ -131,24 +137,34 @@ function OrdenarColuna<L>({
     const Icone = activa && ordem.sentido === 'asc' ? ArrowUp : ArrowDown;
 
     return (
-        <button
-            type="button"
-            onClick={() => alternar(coluna.chave)}
-            aria-label={
+        <ComDica
+            texto={
                 activa
-                    ? `${coluna.cota}. Folha ordenada por ${coluna.cota}, ${
+                    ? `Ordenado por ${coluna.cota.toLowerCase()}, ${
                           ordem.sentido === 'asc' ? 'crescente' : 'decrescente'
                       }. Premir para inverter.`
-                    : `${coluna.cota}. Premir para ordenar a folha por esta coluna.`
+                    : `Premir para ordenar por ${coluna.cota.toLowerCase()}.`
             }
-className={cn(
+        >
+            <button
+                type="button"
+                onClick={() => alternar(coluna.chave)}
+                aria-label={
+                    activa
+                        ? `${coluna.cota}. Folha ordenada por ${coluna.cota}, ${
+                              ordem.sentido === 'asc' ? 'crescente' : 'decrescente'
+                          }. Premir para inverter.`
+                        : `${coluna.cota}. Premir para ordenar a folha por esta coluna.`
+                }
+                className={cn(
                     'flex min-w-0 items-center gap-1 font-mono text-2xs tracking-[0.08em] uppercase',
                     coluna.alinhamento === 'direita' ? 'justify-end' : 'justify-start',
                     activa ? 'text-graphite' : 'text-graphite-64 hover:text-graphite',
                 )}
-        >
-            {coluna.cota}
-            {activa && <Icone aria-hidden className="size-3 shrink-0" />}
-        </button>
+            >
+                {coluna.cota}
+                {activa && <Icone aria-hidden className="size-3 shrink-0" />}
+            </button>
+        </ComDica>
     );
 }

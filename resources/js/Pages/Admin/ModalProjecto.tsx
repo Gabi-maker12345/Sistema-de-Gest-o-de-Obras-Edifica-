@@ -3,6 +3,7 @@ import { useCallback, useEffect, useState, type ReactNode } from 'react';
 import { Calendario } from '@/Components/ui/calendario';
 import { Combo } from '@/Components/ui/combobox';
 import { Campo, CampoDerivado } from '@/Components/ui/field';
+import { ComDica } from '@/Components/ui/dica';
 import { Input } from '@/Components/ui/input';
 import { ModalForma } from '@/Components/ui/modal-forma';
 import {
@@ -336,20 +337,22 @@ export function ModalProjecto({
                         rotulo={
                             <>
                                 Valor contratual
-                                <button
-                                    type="button"
-                                    onClick={() =>
-                                        definirExplicarContratual(!explicarContratual)
-                                    }
-                                    aria-expanded={explicarContratual}
-                                    aria-controls="explicacao-contratual"
-                                    className="ml-1.5 inline-grid size-4 place-items-center rounded-full border border-graphite-32 font-mono text-2xs text-graphite-64 transition-colors hover:border-graphite hover:text-graphite focus-visible:border-amber focus-visible:ring-1 focus-visible:ring-amber focus-visible:outline-none"
-                                >
-                                    <span aria-hidden>?</span>
-                                    <span className="sr-only">
-                                        Qual a diferença entre orçamento e valor contratual
-                                    </span>
-                                </button>
+                                <ComDica texto="Qual a diferença entre orçamento e valor contratual">
+                                    <button
+                                        type="button"
+                                        onClick={() =>
+                                            definirExplicarContratual(!explicarContratual)
+                                        }
+                                        aria-expanded={explicarContratual}
+                                        aria-controls="explicacao-contratual"
+                                        className="ml-1.5 inline-grid size-4 place-items-center rounded-full border border-graphite-32 font-mono text-2xs text-graphite-64 transition-colors hover:border-graphite hover:text-graphite focus-visible:border-amber focus-visible:ring-1 focus-visible:ring-amber focus-visible:outline-none"
+                                    >
+                                        <span aria-hidden>?</span>
+                                        <span className="sr-only">
+                                            Qual a diferença entre orçamento e valor contratual
+                                        </span>
+                                    </button>
+                                </ComDica>
                             </>
                         }
                         htmlFor="projecto-contratual"

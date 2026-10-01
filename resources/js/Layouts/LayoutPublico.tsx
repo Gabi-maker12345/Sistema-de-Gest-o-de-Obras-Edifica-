@@ -11,6 +11,7 @@ import { BarraRevisao } from '@/Components/brand/barra-revisao';
 import { Carimbo } from '@/Components/brand/carimbo';
 import { Marca } from '@/Components/brand/marca';
 import { Toaster } from '@/Components/ui/toaster';
+import { ComDica } from '@/Components/ui/dica';
 
 /**
  * O percurso público é um diagrama de metro: uma linha, estações, e a estação
@@ -67,15 +68,21 @@ export function LayoutPublico({ children }: { children: ReactNode }) {
                         <div className="ml-auto flex items-center gap-2">
                             <AcoesSessao />
 
-                            <button
-                                type="button"
-                                onClick={() => definirAberto(!aberto)}
-                                aria-expanded={aberto}
-                                aria-label={aberto ? 'Fechar menu' : 'Abrir menu'}
-                                className="grid size-9 place-items-center border border-graphite-32 md:hidden"
-                            >
-                                {aberto ? <X aria-hidden className="size-4" /> : <Menu aria-hidden className="size-4" />}
-                            </button>
+                            <ComDica texto={aberto ? 'Fechar menu' : 'Abrir menu'}>
+                                <button
+                                    type="button"
+                                    onClick={() => definirAberto(!aberto)}
+                                    aria-expanded={aberto}
+                                    aria-label={aberto ? 'Fechar menu' : 'Abrir menu'}
+                                    className="grid size-9 place-items-center border border-graphite-32 md:hidden"
+                                >
+                                    {aberto ? (
+                                        <X aria-hidden className="size-4" />
+                                    ) : (
+                                        <Menu aria-hidden className="size-4" />
+                                    )}
+                                </button>
+                            </ComDica>
                         </div>
                     </div>
 

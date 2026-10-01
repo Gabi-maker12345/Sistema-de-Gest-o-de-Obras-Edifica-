@@ -7,6 +7,7 @@ import { Selo } from '@/Components/ui/badge';
 import { Botao } from '@/Components/ui/button';
 import { Folha, FolhaCabecalho, FolhaCorpo, FolhaRodape } from '@/Components/ui/card';
 import { Confirmacao } from '@/Components/ui/confirmacao';
+import { ComDica } from '@/Components/ui/dica';
 import { LayoutAdmin } from '@/Layouts/LayoutAdmin';
 import type { Equipa, MembroEquipa } from '@/Data/types';
 import { useSgo } from '@/Data/SgoContext';
@@ -190,18 +191,22 @@ export default function EquipaDetalhe({ id }: { id: string }) {
                                                         </p>
                                                     </div>
 
-                                                    <button
-                                                        type="button"
-                                                        onClick={() => definirARetirar(membro)}
-                                                        className="grid size-8 shrink-0 place-items-center border border-graphite-32 text-graphite-64 transition-colors hover:border-red-pencil hover:text-red-pencil focus-visible:border-amber focus-visible:ring-1 focus-visible:ring-amber focus-visible:outline-none"
+                                                    <ComDica
+                                                        texto={`Registar saída de ${pessoa?.nome ?? membro.utilizadorId}`}
                                                     >
-                                                        <LogOut aria-hidden className="size-3.5" />
-                                                        <span className="sr-only">
-                                                            Registar saída de{' '}
-                                                            {pessoa?.nome ?? membro.utilizadorId} da
-                                                            equipa
-                                                        </span>
-                                                    </button>
+                                                        <button
+                                                            type="button"
+                                                            onClick={() => definirARetirar(membro)}
+                                                            className="grid size-8 shrink-0 place-items-center border border-graphite-32 text-graphite-64 transition-colors hover:border-red-pencil hover:text-red-pencil focus-visible:border-amber focus-visible:ring-1 focus-visible:ring-amber focus-visible:outline-none"
+                                                        >
+                                                            <LogOut aria-hidden className="size-3.5" />
+                                                            <span className="sr-only">
+                                                                Registar saída de{' '}
+                                                                {pessoa?.nome ?? membro.utilizadorId} da
+                                                                equipa
+                                                            </span>
+                                                        </button>
+                                                    </ComDica>
                                                 </li>
                                             );
                                         })}

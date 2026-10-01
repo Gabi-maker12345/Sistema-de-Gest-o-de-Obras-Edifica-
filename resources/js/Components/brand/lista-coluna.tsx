@@ -1,6 +1,7 @@
 import { useState } from 'react';
 
 import { Janela, JanelaConteudo, JanelaTitulo } from '@/Components/ui/dialog';
+import { ComDica } from '@/Components/ui/dica';
 import { cn } from '@/lib/utils';
 
 /**
@@ -78,17 +79,18 @@ export function ListaColuna({
 
     return (
         <>
-            <button
-                type="button"
-                title={`${contagem} ${quantos}: ${itens.join(' · ')}`}
-                onClick={() => definirAberto(true)}
-                className="group inline-flex items-baseline gap-1.5 font-mono text-sm tabular text-graphite transition-colors hover:text-graphite focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-amber"
-            >
-                {contagem}
-                <span className="cota underline decoration-dotted decoration-graphite-48 underline-offset-[3px] transition-colors group-hover:decoration-graphite">
-                    {quantos}
-                </span>
-            </button>
+            <ComDica texto={`${contagem} ${quantos}: ${itens.join(' · ')}`}>
+                <button
+                    type="button"
+                    onClick={() => definirAberto(true)}
+                    className="group inline-flex items-baseline gap-1.5 font-mono text-sm tabular text-graphite transition-colors hover:text-graphite focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-amber"
+                >
+                    {contagem}
+                    <span className="cota underline decoration-dotted decoration-graphite-48 underline-offset-[3px] transition-colors group-hover:decoration-graphite">
+                        {quantos}
+                    </span>
+                </button>
+            </ComDica>
 
             <Janela open={aberto} onOpenChange={(estado) => !estado && definirAberto(false)}>
                 <JanelaConteudo className="max-w-sm">

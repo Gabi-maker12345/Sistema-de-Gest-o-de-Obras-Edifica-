@@ -9,6 +9,7 @@ import { Marca } from '@/Components/brand/marca';
 import { SelectorVerComo } from '@/Components/brand/selector-ver-como';
 import { SinoNotificacoes } from '@/Components/brand/sino-notificacoes';
 import { Selo } from '@/Components/ui/badge';
+import { ComDica } from '@/Components/ui/dica';
 import { Toaster } from '@/Components/ui/toaster';
 
 import { useSgo } from '@/Data/SgoContext';
@@ -76,14 +77,16 @@ function BarraAdmin({ abrirIndice }: { abrirIndice: () => void }) {
     return (
         <header className="sticky top-0 z-40 border-b border-regua-12 bg-tabua">
             <div className="flex h-14 items-center gap-2 px-4 sm:gap-3 sm:px-6">
-                <button
-                    type="button"
-                    onClick={abrirIndice}
-                    className="grid size-9 shrink-0 place-items-center text-tinta-72 transition-colors hover:bg-placa hover:text-tinta lg:hidden"
-                >
-                    <PanelLeft aria-hidden className="size-4" />
-                    <span className="sr-only">Abrir índice de folhas</span>
-                </button>
+                <ComDica texto="Índice de folhas">
+                    <button
+                        type="button"
+                        onClick={abrirIndice}
+                        className="grid size-9 shrink-0 place-items-center text-tinta-72 transition-colors hover:bg-placa hover:text-tinta lg:hidden"
+                    >
+                        <PanelLeft aria-hidden className="size-4" />
+                        <span className="sr-only">Abrir índice de folhas</span>
+                    </button>
+                </ComDica>
 
                 <Link href={route('admin.dashboard')} aria-label="SGO, painel" className="lg:hidden">
                     <Marca compacta sobreTabua />

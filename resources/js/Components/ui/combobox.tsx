@@ -5,6 +5,7 @@ import { useEffect, useMemo, useRef, useState } from 'react';
 import { cn } from '@/lib/utils';
 
 import { Bolha, BolhaConteudo } from './popover';
+import { ComDica } from './dica';
 
 /**
  * O combo: o campo das entidades relacionadas.
@@ -157,14 +158,16 @@ export function Combo({
                 </PopoverPrimitive.Trigger>
 
                 {aoLimpar && valor && !desactivado && (
-                    <button
-                        type="button"
-                        onClick={aoLimpar}
-                        className="grid size-10 shrink-0 place-items-center border border-graphite-32 text-graphite-64 transition-colors hover:border-graphite hover:text-graphite"
-                    >
-                        <X aria-hidden className="size-4" />
-                        <span className="sr-only">Limpar escolha</span>
-                    </button>
+<ComDica texto="Limpar escolha">
+                <button
+                    type="button"
+                    onClick={aoLimpar}
+                    className="grid size-10 shrink-0 place-items-center border border-graphite-32 text-graphite-64 transition-colors hover:border-graphite hover:text-graphite"
+                >
+                    <X aria-hidden className="size-4" />
+                    <span className="sr-only">Limpar escolha</span>
+                </button>
+            </ComDica>
                 )}
             </div>
 
