@@ -56,4 +56,15 @@ Route::middleware('auth')->prefix('admin')->name('admin.')->group(function () {
     Route::get('/equipas/{equipa}', fn () => Inertia::render('Admin/EquipaDetalhe', [
         'id' => request()->route('equipa'),
     ]))->name('equipas.mostrar');
+
+    /*
+     | Agenda e as minhas tarefas (spec §13, fase 4). O mesmo contrato da fase
+     | anterior: as rotas não recebem registo nenhum, porque os eventos e as
+     | tarefas vivem no contexto em memória. A folha agregada lê as tarefas do
+     | utilizador que o selector "Ver como" está a simular, e por isso também
+     | não recebe o id — quem lê é o contexto.
+     */
+    Route::get('/agenda', fn () => Inertia::render('Admin/Agenda'))->name('agenda');
+
+    Route::get('/tarefas', fn () => Inertia::render('Admin/MinhasTarefas'))->name('tarefas');
 });

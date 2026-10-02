@@ -78,6 +78,37 @@ test('o detalhe da equipa entrega o identificador a ficha', function () {
             ->where('id', 'eq7'));
 });
 
+/*
+| A Agenda e As minhas tarefas (fase 4). Nenhuma das duas recebe prop: os eventos
+| e as tarefas vivem no contexto em memoria, e quem os filtra e o utilizador que
+| o selector "Ver como" esta a simular — por isso o id nao viaja na rota. O teste
+| fixa so que a folha certa abre, que e o que a rota e responsavel por.
+*/
+test('a agenda e as minhas tarefas abrem a folha certa', function (string $rota, string $folha) {
+    $utilizador = User::factory()->create();
+
+    $this->actingAs($utilizador)
+        ->get($rota)
+        ->assertOk()
+        ->assertInertia(fn (AssertableInertia $page) => $page->component($folha));
+})->with([
+    ['/admin/agenda', 'Admin/Agenda'],
+    ['/admin/tarefas', 'Admin/MinhasTarefas'],
+]);
+
+test('as folhas da fase 4 nao entregam identificador', function (string $rota) {
+    $utilizador = User::factory()->create();
+
+    $this->actingAs($utilizador)
+        ->get($rota)
+        ->assertOk()
+        ->assertInertia(fn (AssertableInertia $page) => $page->missing('id'));
+})->with(['/admin/agenda', '/admin/tarefas']);
+
+test('a agenda e as minhas tarefas exigem sessao', function (string $rota) {
+    $this->get($rota)->assertRedirect('/login');
+})->with(['/admin/agenda', '/admin/tarefas']);
+
 test('os cadastros da fase 3 exigem sessao', function (string $rota) {
     $this->get($rota)->assertRedirect('/login');
 })->with([

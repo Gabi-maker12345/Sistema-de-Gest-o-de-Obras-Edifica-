@@ -61,8 +61,12 @@ const FOLHAS: Array<{ grupo: string; folhas: Folha[] }> = [
                 href: route('admin.dashboard'),
                 icone: ChartNoAxesColumn,
             },
-            { nome: 'Agenda', icone: CalendarDays },
-            { nome: 'As minhas tarefas', icone: ListChecks },
+            { nome: 'Agenda', href: route('admin.agenda'), icone: CalendarDays },
+            {
+                nome: 'As minhas tarefas',
+                href: route('admin.tarefas'),
+                icone: ListChecks,
+            },
         ],
     },
     {
