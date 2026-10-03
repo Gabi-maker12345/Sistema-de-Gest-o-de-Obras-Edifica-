@@ -28,7 +28,7 @@ export function BlocoTitulo({
     return (
         <dl
             className={cn(
-                'grid grid-cols-2 gap-px border border-graphite-32 bg-graphite-20 font-mono text-2xs tracking-[0.06em] uppercase sm:grid-cols-4',
+                'grid w-full grid-cols-2 gap-px border border-graphite-32 bg-graphite-20 font-mono text-2xs tracking-[0.06em] uppercase sm:grid-cols-4',
                 className,
             )}
         >
