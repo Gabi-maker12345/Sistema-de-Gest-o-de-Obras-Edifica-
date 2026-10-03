@@ -67,4 +67,19 @@ Route::middleware('auth')->prefix('admin')->name('admin.')->group(function () {
     Route::get('/agenda', fn () => Inertia::render('Admin/Agenda'))->name('agenda');
 
     Route::get('/tarefas', fn () => Inertia::render('Admin/MinhasTarefas'))->name('tarefas');
+
+    /*
+     | Execução (spec §13, fase 5). Estas quatro folhas são módulos do índice —
+     | gavetas com tampa, ao lado de Projectos e Equipas — e não separadores da
+     | ficha. O registo que mostram é sempre de uma obra, e por isso a escolha
+     | da obra vive no estado da folha e não na rota: a rota diz que módulo se
+     | abre, não que registo se está a ler. É o mesmo contrato da Agenda.
+     */
+    Route::get('/actividades', fn () => Inertia::render('Admin/Actividades'))->name('actividades');
+
+    Route::get('/diario', fn () => Inertia::render('Admin/Diario'))->name('diario');
+
+    Route::get('/fotografias', fn () => Inertia::render('Admin/Fotografias'))->name('fotografias');
+
+    Route::get('/documentos', fn () => Inertia::render('Admin/Documentos'))->name('documentos');
 });

@@ -77,7 +77,11 @@ const FOLHAS: Array<{ grupo: string; folhas: Folha[] }> = [
                 href: route('admin.projectos'),
                 icone: FolderKanban,
             },
-            { nome: 'Actividades', icone: ListOrdered },
+            {
+                nome: 'Actividades',
+                href: route('admin.actividades'),
+                icone: ListOrdered,
+            },
             {
                 nome: 'Equipas',
                 href: route('admin.equipas'),
@@ -98,9 +102,21 @@ const FOLHAS: Array<{ grupo: string; folhas: Folha[] }> = [
     {
         grupo: 'Registo de campo',
         folhas: [
-            { nome: 'Diário de obra', icone: NotebookPen },
-            { nome: 'Fotografias', icone: Camera },
-            { nome: 'Documentos', icone: FileText },
+            {
+                nome: 'Diário de obra',
+                href: route('admin.diario'),
+                icone: NotebookPen,
+            },
+            {
+                nome: 'Fotografias',
+                href: route('admin.fotografias'),
+                icone: Camera,
+            },
+            {
+                nome: 'Documentos',
+                href: route('admin.documentos'),
+                icone: FileText,
+            },
         ],
     },
     {
@@ -223,7 +239,7 @@ function MarcaPasta() {
                 Pasta de obra · índice de folhas
             </p>
             <p className="anotacao mt-0.5 text-pasta-ink normal-case">
-                07 separadoras · 01 emitida
+                07 separadoras · 07 emitidas
             </p>
         </div>
     );

@@ -109,6 +109,41 @@ test('a agenda e as minhas tarefas exigem sessao', function (string $rota) {
     $this->get($rota)->assertRedirect('/login');
 })->with(['/admin/agenda', '/admin/tarefas']);
 
+/*
+| Os quatro modulos de execucao (spec, fase 5). Sao folhas do indice — gavetas
+| com tampa, ao lado de Projectos e Equipas — e nao separadores da ficha do
+| projecto. O registo que mostram e sempre de uma obra, e por isso a escolha da
+| obra vive no estado da folha e nao na rota: a rota diz que modulo se abre, nao
+| que registo se esta a ler. Mesmo contrato da Agenda, e mesmo motivo para o
+| teste nao esperar identificador.
+ */
+test('os modulos de execucao abrem a folha certa', function (string $rota, string $folha) {
+    $utilizador = User::factory()->create();
+
+    $this->actingAs($utilizador)
+        ->get($rota)
+        ->assertOk()
+        ->assertInertia(fn (AssertableInertia $page) => $page->component($folha));
+})->with([
+    ['/admin/actividades', 'Admin/Actividades'],
+    ['/admin/diario', 'Admin/Diario'],
+    ['/admin/fotografias', 'Admin/Fotografias'],
+    ['/admin/documentos', 'Admin/Documentos'],
+]);
+
+test('os modulos de execucao nao entregam identificador', function (string $rota) {
+    $utilizador = User::factory()->create();
+
+    $this->actingAs($utilizador)
+        ->get($rota)
+        ->assertOk()
+        ->assertInertia(fn (AssertableInertia $page) => $page->missing('id'));
+})->with(['/admin/actividades', '/admin/diario', '/admin/fotografias', '/admin/documentos']);
+
+test('os modulos de execucao exigem sessao', function (string $rota) {
+    $this->get($rota)->assertRedirect('/login');
+})->with(['/admin/actividades', '/admin/diario', '/admin/fotografias', '/admin/documentos']);
+
 test('os cadastros da fase 3 exigem sessao', function (string $rota) {
     $this->get($rota)->assertRedirect('/login');
 })->with([
