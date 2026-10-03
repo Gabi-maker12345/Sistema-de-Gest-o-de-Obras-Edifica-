@@ -25,8 +25,33 @@ import { dataExtenso, moeda, numero, percentagem } from '@/lib/format';
 import { rotuloPapel } from '@/lib/rotulos';
 import { cn } from '@/lib/utils';
 
+import { FolhaHistorico } from '@/Components/brand/folha-historico';
+
+import { FolhaActividades } from './execucao/folha-actividades';
+import { FolhaDiario } from './execucao/folha-diario';
+import { FolhaDocumentos } from './execucao/folha-documentos';
+import { FolhaTarefas } from './execucao/folha-tarefas';
+import { FolhaFotografias } from './execucao/galeria-fotografias';
 import { ModalAcesso } from './ModalAcesso';
 import { ModalProjecto } from './ModalProjecto';
+
+/**
+ * As abas da ficha de um projecto.
+ *
+ * A ordem não é a ordem da spec e não é alfabética: é a ordem de quem entra na
+ * obra. Primeiro com quem se conta, depois o resumo, e só depois a execução —
+ * actividades, tarefas, diário, fotografias, documentos — e o histórico no
+ * fim, porque é a pergunta que se faz quando algo já não bate certo.
+ */
+type AbaProjecto =
+    | 'acessos'
+    | 'resumo'
+    | 'actividades'
+    | 'tarefas'
+    | 'diario'
+    | 'fotografias'
+    | 'documentos'
+    | 'historico';
 
 /**
  * `/admin/projectos/{id}` — a ficha de um projecto.
@@ -57,7 +82,7 @@ export default function ProjectoDetalhe({ id }: { id: string }) {
         despesasAprovadas,
     } = useSgo();
 
-    const [aba, definirAba] = useState<'acessos' | 'resumo'>('acessos');
+    const [aba, definirAba] = useState<AbaProjecto>('acessos');
     const [modal, definirModal] = useState(false);
     const [acesso, definirAcesso] = useState(false);
 
@@ -70,6 +95,12 @@ export default function ProjectoDetalhe({ id }: { id: string }) {
     const area = estado.areas.find((a) => a.id === projecto.areaId) ?? null;
     const gestor = estado.utilizadores.find((u) => u.id === projecto.gestorId) ?? null;
     const acessos = estado.acessos.filter((acesso) => acesso.projectoId === projecto.id);
+
+    const actividades = estado.actividades.filter((a) => a.projectoId === projecto.id);
+    const tarefas = estado.tarefas.filter((t) => t.projectoId === projecto.id);
+    const diarios = estado.diarios.filter((d) => d.projectoId === projecto.id);
+    const fotografias = estado.fotografias.filter((f) => f.projectoId === projecto.id);
+    const documentos = estado.documentos.filter((d) => d.projectoId === projecto.id);
 
     const meuAcesso = acessos.find((acesso) => acesso.utilizadorId === utilizadorEfectivo.id);
     const comAcessoTotal = perfilEfectivo === 'administrador_proprietario';
@@ -94,7 +125,7 @@ export default function ProjectoDetalhe({ id }: { id: string }) {
 
                     <Abas
                         value={aba}
-                        onValueChange={(valor) => definirAba(valor as 'acessos' | 'resumo')}
+                        onValueChange={(valor) => definirAba(valor as AbaProjecto)}
                     >
                         <AbaLista>
                             <Aba value="acessos">
@@ -102,6 +133,29 @@ export default function ProjectoDetalhe({ id }: { id: string }) {
                                 <span className="cota ml-1.5 tabular">{acessos.length}</span>
                             </Aba>
                             <Aba value="resumo">Resumo</Aba>
+                            <Aba value="actividades">
+                                Actividades
+                                <span className="cota ml-1.5 tabular">
+                                    {actividades.length}
+                                </span>
+                            </Aba>
+                            <Aba value="tarefas">
+                                Tarefas
+                                <span className="cota ml-1.5 tabular">{tarefas.length}</span>
+                            </Aba>
+                            <Aba value="diario">
+                                Diário
+                                <span className="cota ml-1.5 tabular">{diarios.length}</span>
+                            </Aba>
+                            <Aba value="fotografias">
+                                Fotografias
+                                <span className="cota ml-1.5 tabular">{fotografias.length}</span>
+                            </Aba>
+                            <Aba value="documentos">
+                                Documentos
+                                <span className="cota ml-1.5 tabular">{documentos.length}</span>
+                            </Aba>
+                            <Aba value="historico">Histórico</Aba>
                         </AbaLista>
 
                         <AbaPainel value="acessos" className="pt-6">
@@ -192,6 +246,30 @@ export default function ProjectoDetalhe({ id }: { id: string }) {
                                     rodado={1}
                                 />
                             </div>
+                        </AbaPainel>
+
+                        <AbaPainel value="actividades" className="pt-6">
+                            <FolhaActividades projectoId={projecto.id} />
+                        </AbaPainel>
+
+                        <AbaPainel value="tarefas" className="pt-6">
+                            <FolhaTarefas projectoId={projecto.id} />
+                        </AbaPainel>
+
+                        <AbaPainel value="diario" className="pt-6">
+                            <FolhaDiario projectoId={projecto.id} />
+                        </AbaPainel>
+
+                        <AbaPainel value="fotografias" className="pt-6">
+                            <FolhaFotografias projectoId={projecto.id} />
+                        </AbaPainel>
+
+                        <AbaPainel value="documentos" className="pt-6">
+                            <FolhaDocumentos projectoId={projecto.id} />
+                        </AbaPainel>
+
+                        <AbaPainel value="historico" className="pt-6">
+                            <FolhaHistorico entidade="Projecto" registoId={projecto.id} />
                         </AbaPainel>
                     </Abas>
                 </div>

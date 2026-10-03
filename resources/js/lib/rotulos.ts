@@ -1,5 +1,6 @@
 import type {
     CategoriaDespesa,
+    CondicaoMeteorologica,
     EstadoActividade,
     EstadoAprovacao,
     EstadoDecisao,
@@ -64,6 +65,18 @@ const ROTULOS = {
         alta: 'Alta',
         urgente: 'Urgente',
     } satisfies Record<PrioridadeTarefa, string>,
+
+    /**
+     * O céu do diário de obra, escrito como se diz em obra: quem lê o diário quer
+     * saber se choveu, e «Chuva» é o que aconteceu enquanto «Nublado» só diz
+     * que o céu estava tapado.
+     */
+    meteorologia: {
+        ensolarado: 'Ensolarado',
+        nublado: 'Nublado',
+        chuva: 'Chuva',
+        vento_forte: 'Vento forte',
+    } satisfies Record<CondicaoMeteorologica, string>,
 
     estadoAprovacao: {
         pendente: 'Pendente',

@@ -187,11 +187,18 @@ export interface EventoAgenda {
     lembreteMinutosAntes: number | null;
 }
 
+/**
+ * O céu de um dia de obra. O nome é o do dado porque o dado é gravado por
+ * sincronização a partir do terreno; quem escreve para o utilizador diz
+ * «Chuva», e esse texto vive em `ROTULOS.meteorologia`.
+ */
+export type CondicaoMeteorologica = 'ensolarado' | 'nublado' | 'chuva' | 'vento_forte';
+
 export interface DiarioObra {
     id: string;
     projectoId: string;
     data: string;
-    condicoesMeteorologicas: 'ensolarado' | 'nublado' | 'chuva' | 'vento_forte';
+    condicoesMeteorologicas: CondicaoMeteorologica;
     efectivoPresente: number;
     actividadesRealizadas: string[];
     ocorrencias: string;
