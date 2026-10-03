@@ -1,27 +1,33 @@
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { ResponsiveContainer, Scatter, ScatterChart, XAxis, YAxis } from 'recharts';
+import { useMemo, useState } from 'react';
 
 import type { EventoAgenda } from '@/Data/types';
-import { chaveDia, diaDe, gradeDoMes } from '@/lib/agenda';
+import { DIAS_SEMANA, chaveDia, diaDe, gradeDoMes } from '@/lib/agenda';
 import { cn } from '@/lib/utils';
 
 /**
  * A vista de mês.
  *
- * A grade é desenhada no Recharts como um `ScatterChart` sem eixos: cada ponto
- * é um dia e a forma de cada ponto é a célula. Não é o uso óbvio da biblioteca —
- * aqui não há série a medir, há uma grelha a desenhar — mas é o que dá a escala
- * e o redimensionamento sem escrever a medida à mão, e o `shape` deixa a célula
- * ser a prancha: hairline, o dia em mono tabular e hoje com o traço de acção.
+ * A grade é uma grelha HTML, não um gráfico. Chegou aqui como `ScatterChart`
+ * do Recharts com uma `shape` por célula, e era a decisão errada: o Recharts
+ * desenhava a hachura e os eventosVINham por cima, numa camada absoluta — duas
+ * geometrias a concordar ao píxel, mantidas por dois números escritos à mão.
+ * Quando um dia e um evento se desalinham, a falha é silenciosa e parece um
+ * defeito de CSS.
  *
- * O que o gráfico não faz é mostrar os eventos. Quem os escreve é a camada HTML
- * por cima, porque um `<button>` dentro de um `shape` não é focável, e um evento
- * que não se abre ao teclado não é um evento: é uma imagem.
+ * Numa grelha só não há o que desalinhar: o browser resolve a largura, a
+ * altura e as quebras, e o evento vive dentro da sua própria célula. O Recharts
+ * continua no Dashboard, onde é a ferramenta certa.
+ *
+ * Os dias do mês vizinho entram esbatidos porque é assim que se lê a semana
+ * que atravessa a virada do mês, e o dia de hoje leva o traço de acção — o âmbar
+ * a dizer «aqui».
  */
 
-/** Altura de uma faixa do mês. O número aparece duas vezes e tem de ser o mesmo. */
-const ALTURA = 108;
-const FAIXAS = 6;
+/** Altura mínima de uma célula. Alto o suficiente para três barras de evento. */
+const ALTURA_MINIMA = 'min-h-[108px]';
+
+/** Quantos eventos cabem antes de a célula dizer que há mais. */
+const CABEM = 3;
 
 export function VistaMes({
     referencia,
@@ -33,52 +39,14 @@ export function VistaMes({
     referencia: Date;
     /** Eventos já filtrados pelo que o utilizador pode ver. */
     eventos: EventoAgenda[];
-    /** Nome do projecto por id, para o badge do evento. */
+    /** Nome do projecto por id, para a pista do evento. */
     projectos: Record<string, string>;
-    /** `dia` ao clicar no dia, `dia` + `evento` ao clicar num evento. */
+    /** Recebe o dia e, se o clique foi num evento, o evento. */
     aoEscolher: (dia: string, evento?: EventoAgenda) => void;
     seleccionado: string | null;
 }) {
-    const [largura, definirLargura] = useState(0);
-    const caixa = useRef<HTMLDivElement>(null);
-
-    // A largura da célula vem do contentor medido, não de `window`: o mês vive
-    // dentro de uma folha que muda com a janela e com a barra de revisão.
-    useEffect(() => {
-        const elemento = caixa.current;
-
-        if (!elemento) {
-            return;
-        }
-
-        const medir = () => definirLargura(elemento.clientWidth);
-
-        medir();
-
-        const observador = new ResizeObserver(medir);
-
-        observador.observe(elemento);
-
-        return () => observador.disconnect();
-    }, []);
-
     const dias = useMemo(() => gradeDoMes(referencia), [referencia]);
-
-    /**
-     * Cada dia vira um ponto: coluna 0–6, linha 0–5. O Recharts dá as
-     * coordenadas do ponto em píxeis e a forma desenha a célula à volta delas.
-     */
-    const pontos = useMemo(
-        () =>
-            dias.map((dia, indice) => ({
-                x: indice % 7,
-                y: Math.floor(indice / 7),
-                chave: chaveDia(dia),
-                doMes: dia.getMonth() === referencia.getMonth(),
-                hoje: chaveDia(dia) === chaveDia(new Date()),
-            })),
-        [dias, referencia],
-    );
+    const hoje = chaveDia(new Date());
 
     const porDia = useMemo(() => {
         const mapa = new Map<string, EventoAgenda[]>();
@@ -98,146 +66,124 @@ export function VistaMes({
         return mapa;
     }, [eventos]);
 
-    const celula = largura / 7;
-
     return (
         <div className="space-y-2">
             <div className="grid grid-cols-7 border-b border-graphite-32 pb-1">
-                {['seg', 'ter', 'qua', 'qui', 'sex', 'sáb', 'dom'].map((dia, indice) => (
-                    <p key={dia} className={cn('cota text-center', indice > 4 && 'text-graphite-48')}>
+                {DIAS_SEMANA.map((dia, indice) => (
+                    <p
+                        key={dia}
+                        className={cn('cota text-center', indice > 4 && 'text-graphite-48')}
+                    >
                         {dia}
                     </p>
                 ))}
             </div>
 
-            <div ref={caixa} className="relative">
-                {largura > 0 && (
-                    <>
-                        <ResponsiveContainer width={largura} height={ALTURA * FAIXAS}>
-                            <ScatterChart margin={{ top: 0, right: 0, bottom: 0, left: 0 }}>
-                                <XAxis
-                                    type="number"
-                                    dataKey="x"
-                                    domain={[0, 6]}
-                                    hide
-                                    allowDecimals={false}
-                                />
-                                <YAxis
-                                    type="number"
-                                    dataKey="y"
-                                    domain={[0, 5]}
-                                    reversed
-                                    hide
-                                    allowDecimals={false}
-                                />
-                                <Scatter
-                                    data={pontos}
-                                    isAnimationActive={false}
-                                    shape={(bruto: unknown) => {
-                                        const { cx, cy, payload } = bruto as {
-                                            cx: number;
-                                            cy: number;
-                                            payload: (typeof pontos)[number];
-                                        };
+            <div className="grid grid-cols-7 gap-px overflow-hidden border border-graphite-12 bg-graphite-12">
+                {dias.map((dia) => {
+                    const chave = chaveDia(dia);
+                    const doMes = dia.getMonth() === referencia.getMonth();
 
-                                        return (
-                                            <rect
-                                                x={cx - celula / 2}
-                                                y={cy - ALTURA / 2}
-                                                width={celula}
-                                                height={ALTURA}
-                                                fill="transparent"
-                                                stroke={
-                                                    payload.hoje
-                                                        ? 'var(--amber)'
-                                                        : 'var(--graphite-12)'
-                                                }
-                                                strokeWidth={1}
-                                            />
-                                        );
-                                    }}
-                                />
-                            </ScatterChart>
-                        </ResponsiveContainer>
+                    return (
+                        <div
+                            key={chave}
+                            className={cn(
+                                ALTURA_MINIMA,
+                                'flex flex-col gap-1 bg-paper p-1.5',
+                                chave === hoje && 'bg-amber-08',
+                            )}
+                        >
+                            <NumeroDoDia
+                                chave={chave}
+                                doMes={doMes}
+                                hoje={chave === hoje}
+                            />
 
-                        <div className="pointer-events-none absolute inset-0 grid grid-cols-7 grid-rows-6">
-                            {pontos.map((ponto) => (
-                                <div key={ponto.chave} className="pointer-events-auto">
-                                    <EventosDoDia
-                                        ponto={ponto}
-                                        eventos={porDia.get(ponto.chave) ?? []}
-                                        projectos={projectos}
-                                        aoEscolher={aoEscolher}
-                                        seleccionado={seleccionado}
-                                    />
-                                </div>
-                            ))}
+                            <EventosDoDia
+                                chave={chave}
+                                eventos={porDia.get(chave) ?? []}
+                                projectos={projectos}
+                                aoEscolher={aoEscolher}
+                                seleccionado={seleccionado}
+                            />
                         </div>
-                    </>
-                )}
+                    );
+                })}
             </div>
         </div>
     );
 }
 
 /**
- * Os eventos de um dia, por cima da célula.
+ * O número do dia. Hoje é o único com âmbar: é a acção, não um destaque, e é
+ * o que diz ao olho onde estamos dentro do mês.
+ */
+function NumeroDoDia({
+    chave,
+    doMes,
+    hoje,
+}: {
+    chave: string;
+    doMes: boolean;
+    hoje: boolean;
+}) {
+    return (
+        <span
+            aria-current={hoje ? 'date' : undefined}
+            className={cn(
+                'flex h-5 items-center justify-end rounded-nib px-1 font-mono text-2xs tabular',
+                hoje && 'bg-amber font-semibold text-graphite',
+                !hoje && doMes && 'text-graphite',
+                !hoje && !doMes && 'text-graphite-32',
+            )}
+        >
+            {Number(chave.slice(8))}
+        </span>
+    );
+}
+
+/**
+ * Os eventos de uma célula.
  *
- * Só entra o que cabe: 108px de faixa comportam três barras e o número do dia.
- * O que sobra diz-se na última linha («+2»), porque um dia com sete compromissos
- * é um dia para ler, não para espremer.
+ * Cabem três. O que sobra diz-se na última linha («+2») em vez de espremer o
+ * sétimo compromisso numa barra de seis pixels: um dia com sete compromissos é
+ * um dia para ler, não para espremer.
+ *
+ * O dia inteiro também é clicável, e é o alvo grande — quem tem um evento na
+ * cabeça e só quer a data não tem de acertar numa barra de 20px.
  */
 function EventosDoDia({
-    ponto,
+    chave,
     eventos,
     projectos,
     aoEscolher,
     seleccionado,
 }: {
-    ponto: { chave: string; doMes: boolean; hoje: boolean };
+    chave: string;
     eventos: EventoAgenda[];
     projectos: Record<string, string>;
     aoEscolher: (dia: string, evento?: EventoAgenda) => void;
     seleccionado: string | null;
 }) {
     const [expandido, definirExpandido] = useState(false);
-    const visiveis = expandido ? eventos : eventos.slice(0, 3);
+
+    if (eventos.length === 0) {
+        return null;
+    }
+
+    const visiveis = expandido ? eventos : eventos.slice(0, CABEM);
     const restantes = eventos.length - visiveis.length;
 
-    const abrirDia = useCallback(() => {
-        definirExpandido(!expandido);
-    }, [expandido]);
-
     return (
-        <div className="flex h-full flex-col gap-px p-1">
-            <button
-                type="button"
-                onClick={abrirDia}
-                aria-expanded={expandido}
-                aria-label={`${ponto.chave}${eventos.length > 0 ? `, ${eventos.length} eventos` : ''}`}
-                className={cn(
-                    'flex h-5 items-center justify-end rounded-nib px-1 font-mono text-2xs tabular',
-                    'focus-visible:ring-1 focus-visible:ring-amber focus-visible:outline-none',
-                    ponto.hoje
-                        ? 'bg-amber font-semibold text-graphite'
-                        : ponto.doMes
-                          ? 'text-graphite hover:bg-graphite-08'
-                          : 'text-graphite-32',
-                )}
-            >
-                {Number(ponto.chave.slice(8))}
-            </button>
-
+        <div className="flex flex-col gap-px">
             {visiveis.map((evento) => (
                 <button
                     key={evento.id}
                     type="button"
-                    onClick={() => aoEscolher(ponto.chave, evento)}
-                    title={`${horaCurta(evento.dataHoraInicio)} · ${evento.titulo}${
-                        evento.projectoId ? ` · ${projectos[evento.projectoId] ?? ''}` : ''
-                    }`}
+                    onClick={() => aoEscolher(chave, evento)}
+                    title={pista(evento, projectos)}
                     className={cn(
-                        'flex items-center gap-1 rounded-nib px-1 text-left text-2xs',
+                        'flex items-center gap-1 rounded-nib px-1 py-px text-left text-2xs',
                         'focus-visible:ring-1 focus-visible:ring-amber focus-visible:outline-none',
                         seleccionado === evento.id
                             ? 'bg-graphite-08 text-graphite ring-1 ring-graphite'
@@ -246,32 +192,52 @@ function EventosDoDia({
                 >
                     <span
                         aria-hidden
-                        className={cn(
-                            'size-1.5 shrink-0 rounded-full',
-                            evento.tipo === 'obra'
-                                ? 'bg-stamp'
-                                : evento.tipo === 'profissional'
-                                  ? 'bg-graphite-64'
-                                  : 'bg-amber',
-                        )}
+                        className={cn('size-1.5 shrink-0', pontoDoTipo(evento.tipo))}
                     />
-                    <span className="truncate">
-                        {horaCurta(evento.dataHoraInicio)} {evento.titulo}
-                    </span>
+                    <span className="truncate">{horaCurta(evento.dataHoraInicio)}</span>
+                    <span className="truncate">{evento.titulo}</span>
                 </button>
             ))}
 
             {restantes > 0 && (
                 <button
                     type="button"
-                    onClick={abrirDia}
-                    className="cota px-1 text-left text-graphite-48 focus-visible:ring-1 focus-visible:ring-amber focus-visible:outline-none"
+                    onClick={() => definirExpandido(!expandido)}
+                    aria-expanded={expandido}
+                    className={cn(
+                        'cota px-1 text-left text-graphite-48',
+                        'focus-visible:ring-1 focus-visible:ring-amber focus-visible:outline-none',
+                    )}
                 >
                     +{restantes}
                 </button>
             )}
         </div>
     );
+}
+
+/**
+ * O ponto do tipo: a cor é a única codificação do tipo na vista de mês, e é
+ * legível porque o tipo também se lê pelo texto ao lado. `obra` é carimbo — é
+ * identidade; profissional é grafite; pessoal é âmbar, e o âmbar aqui é o traço
+ * de acção sobre o dia, não um enfeite.
+ */
+function pontoDoTipo(tipo: EventoAgenda['tipo']): string {
+    if (tipo === 'obra') {
+        return 'bg-stamp';
+    }
+
+    return tipo === 'profissional' ? 'bg-graphite-48' : 'bg-amber';
+}
+
+function pista(evento: EventoAgenda, projectos: Record<string, string>): string {
+    const partes = [
+        `${horaCurta(evento.dataHoraInicio)} · ${evento.titulo}`,
+        evento.local || null,
+        evento.projectoId ? projectos[evento.projectoId] : null,
+    ];
+
+    return partes.filter(Boolean).join(' · ');
 }
 
 function horaCurta(iso: string): string {
