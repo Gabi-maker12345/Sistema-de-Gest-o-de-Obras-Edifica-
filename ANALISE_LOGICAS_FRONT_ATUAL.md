@@ -64,8 +64,9 @@ Fora do ambito por enquanto:
 
 ### Notificacoes
 
+- A base real ja existe: tabela `notifications` padrao do Laravel (migration propria, colunas `uuid`, `data`, `read_at`), modelo `User` com `Notifiable` e o sino do front a consumir notificacoes em memoria. Falta apenas o controller (`NotificacaoController` esta stub) e as rotas de leitura/marcacao; o esforco e menor do que parece.
 - Manter notificacoes in-app.
-- Implementar leitura/marcacao como lida persistente.
+- Implementar leitura/marcacao como lida persistente via `markAsRead()`/`markAsUnread()` do Laravel sobre a tabela existente.
 - So criar links para destinos com rota emitida. Enquanto o modulo nao existe, a notificacao deve continuar informativa, sem mandar para ecras vazios.
 
 ### Busca, filtros e ordenacao
@@ -111,6 +112,7 @@ Fora do ambito por enquanto:
 - Recalcular execucao fisica e financeira apos mudancas em actividades e despesas aprovadas.
 - No detalhe, carregar resumo, actividades, tarefas, equipas, diario, fotografias, documentos e historico do projecto.
 - Na aba Acessos, adicionar/remover utilizadores e alterar papel no projecto sem confundir com perfil global.
+- O acesso por projecto vive no pivot `projecto_user` (colunas `papel`, unico por projecto+utilizador). As permissoes granulares de leitura, escrita e financeiro nao sao colunas separadas: derivam do enum `PapelProjecto` (`podeEscrever()` e `podeVerFinanceiro()`), consumido pela `ProjectoAwarePolicy`. O endpoint de acessos deve aceitar/expôr apenas o papel e deixar a derivação de permissões no servidor; nao desenhar campos read/write/financeiro independentes no formulario.
 - Impedir a remocao perigosa do proprio acesso quando isso deixaria o utilizador sem caminho para a obra, salvo administrador/proprietario.
 
 ### Utilizadores

@@ -7,6 +7,7 @@ enum PrioridadeTarefa: string
     case Baixa = 'baixa';
     case Media = 'media';
     case Alta = 'alta';
+    case Urgente = 'urgente';
 
     /**
      * @return array<int, string>
@@ -22,6 +23,7 @@ enum PrioridadeTarefa: string
             self::Baixa => 'Baixa',
             self::Media => 'Média',
             self::Alta => 'Alta',
+            self::Urgente => 'Urgente',
         };
     }
 }

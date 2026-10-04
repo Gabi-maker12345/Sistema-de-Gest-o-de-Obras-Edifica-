@@ -15,11 +15,8 @@ class DatabaseSeeder extends Seeder
      */
     public function run(): void
     {
-        // User::factory(10)->create();
-
-        User::factory()->create([
-            'name' => 'Test User',
-            'email' => 'test@example.com',
-        ]);
+        // Fonte única de dados de demonstração (substitui o seed em memória
+        // do front, resources/js/Data/seed.ts).
+        $this->call(SgoSeeder::class);
     }
 }
