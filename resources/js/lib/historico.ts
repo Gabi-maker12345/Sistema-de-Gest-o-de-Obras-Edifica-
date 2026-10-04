@@ -34,7 +34,7 @@ export const ENTIDADE_POR_COLECCAO: Record<string, string> = {
  * Os rótulos dos campos, escritos como quem os leria na folha.
  *
  * A chave é o campo sem sublinhados e em minúsculas, para que `data_fim_prevista`
- * coming do seed e `dataFimPrevista` vindo do formulário caiam no mesmo sítio.
+ * vindo do seed e `dataFimPrevista` vindo do formulário caiam no mesmo sítio.
  */
 const ROTULO_CAMPO: Record<string, string> = {
     // Projecto
@@ -197,6 +197,15 @@ export function descreverValor(
     const nome = chave(campo);
     const pessoa = utilizadorDe(estado, String(valor));
 
+    /**
+     * O valor de quem o campo aponta, escrito pelo nome de quem é.
+     *
+     * As chaves não levam o `Id`: o formulário escreve `responsavelId` e o seed
+     * `responsavel_id`, e as duas formas têm de dar a mesma pessoa. Por isso a
+     * chave normalizada é procurada tal como está e depois sem o sufixo — sem
+     * isso, `u3` chegava à margem tal como sai do registo, que é exactamente o
+     * que o histórico não pode fazer.
+     */
     const relacionados: Record<string, string> = {
         responsavel: pessoa,
         registadopor: pessoa,
@@ -205,19 +214,23 @@ export function descreverValor(
         uploadpor: pessoa,
         ficheiropor: pessoa,
         tiradapor: pessoa,
-        encarregadoid: pessoa,
+        encarregado: pessoa,
         fornecedor: estado.fornecedores.find((f) => f.id === valor)?.nome ?? 'Fornecedor removido',
         equipa: estado.equipas.find((e) => e.id === valor)?.nome ?? 'Equipa removida',
         actividade:
             estado.actividades.find((a) => a.id === valor)?.nome ?? 'Actividade removida',
         actividadepai:
             estado.actividades.find((a) => a.id === valor)?.nome ?? 'Actividade removida',
+        projecto: estado.projectos.find((p) => p.id === valor)?.nome ?? 'Projecto removido',
         area: estado.areas.find((a) => a.id === valor)?.nome ?? 'Área removida',
-        entidaderelacionadaid: String(valor),
+        entidaderelacionada: String(valor),
     };
 
-    if (relacionados[nome] !== undefined) {
-        return relacionados[nome];
+    const semSufixo = nome.endsWith('id') ? nome.slice(0, -'id'.length) : nome;
+    const relacionado = relacionados[nome] ?? relacionados[semSufixo];
+
+    if (relacionado !== undefined) {
+        return relacionado;
     }
 
     if (nome.startsWith('data') || nome === 'prazo') {
