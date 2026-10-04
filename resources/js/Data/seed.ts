@@ -1501,6 +1501,40 @@ export const estadoInicial: EstadoSgo = {
             para: 'Sim',
         },
         { id: 'h12', entidade: 'Pagamento', registoId: 'pg5', utilizadorId: 'u1', criadoEm: dia(-10), campo: null, de: null, para: null },
+        // Documento: a revisão de um anexo é quase sempre a versão seguinte. As
+        // criações não são escritas aqui — a ficha tira-as do próprio documento
+        // (`uploadPor` e `criadoEm`), e escrevê-las também seria guardar o mesmo
+        // facto em dois sítios para poderem divergir.
+        {
+            id: 'h13',
+            entidade: 'Documento',
+            registoId: 'doc1',
+            utilizadorId: 'u3',
+            criadoEm: dia(-90),
+            campo: 'versao',
+            de: 'v1',
+            para: 'v2',
+        },
+        {
+            id: 'h14',
+            entidade: 'Documento',
+            registoId: 'doc1',
+            utilizadorId: 'u1',
+            criadoEm: dia(-30),
+            campo: 'versao',
+            de: 'v2',
+            para: 'v3',
+        },
+        {
+            id: 'h15',
+            entidade: 'Documento',
+            registoId: 'doc2',
+            utilizadorId: 'u2',
+            criadoEm: dia(-20),
+            campo: 'versao',
+            de: 'v1',
+            para: 'v2',
+        },
     ],
 };
 

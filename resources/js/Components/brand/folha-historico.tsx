@@ -4,6 +4,7 @@ import { FolhaRegistos } from '@/Components/brand/folha-registos';
 import { useSgo } from '@/Data/SgoContext';
 import type { EntradaHistorico } from '@/Data/types';
 import { dataExtenso, dataHora, normalizar } from '@/lib/format';
+import { dePara, rotuloCampo, utilizadorDe } from '@/lib/historico';
 import { useBusca } from '@/Components/brand/contexto-busca';
 
 /**
@@ -61,18 +62,15 @@ export function FolhaHistorico({
                     return true;
                 }
 
-                const pessoa = estado.utilizadores.find(
-                    (utilizador) => utilizador.id === entrada.utilizadorId,
-                );
-
+                // A busca aceita o nome do campo como a folha o escreve
+                // («responsável») e como o registo o guarda (`responsavel_id`):
+                // quem procura não sabe de que lado do tradutor a palavra veio.
                 return normalizar(
-                    `${pessoa?.nome ?? ''} ${entrada.campo ?? ''} ${entrada.de ?? ''} ${
-                        entrada.para ?? ''
-                    }`,
+                    `${utilizadorDe(estado, entrada.utilizadorId)} ${entrada.campo ?? ''} ${rotuloCampo(entrada.campo ?? '')} ${entrada.de ?? ''} ${entrada.para ?? ''}`,
                 ).includes(alvo);
             })
             .sort((a, b) => b.criadoEm.localeCompare(a.criadoEm));
-    }, [estado.historico, estado.utilizadores, entidade, registoId, termo]);
+    }, [estado, entidade, registoId, termo]);
 
     if (estado.historico.length === 0) {
         return null;
@@ -117,18 +115,16 @@ export function FolhaHistorico({
                     </p>
 
                     <p className="text-sm text-graphite">
-                        {nomeDe(estado.utilizadores, entrada.utilizadorId)}
+                        {utilizadorDe(estado, entrada.utilizadorId)}
                     </p>
 
                     <p className="text-sm">
                         {entrada.campo === null ? (
-                            <span className="text-graphite-64">
-                                criou o registo
-                            </span>
+                            <span className="text-graphite-64">criou o registo</span>
                         ) : (
                             <span className="text-graphite-64">
-                                <span className="font-mono text-2xs text-graphite">
-                                    {entrada.campo}
+                                <span className="cota text-graphite">
+                                    {rotuloCampo(entrada.campo)}
                                 </span>{' '}
                                 {dePara(entrada.de, entrada.para)}
                             </span>
@@ -138,30 +134,4 @@ export function FolhaHistorico({
             )}
         </FolhaRegistos>
     );
-}
-
-/**
- * A alteração, escrita como se lê: `estadoGeral: Em execução → Suspenso`.
- *
- * Um valor que não mudou de facto não entra: a entrada que diz que o campo foi
- * gravado com o que já tinha não é uma alteração, é um clique.
- */
-function dePara(de: string | null, para: string | null): string {
-    if (de === null && para === null) {
-        return 'actualizado';
-    }
-
-    if (de === null) {
-        return `passou a ${para}`;
-    }
-
-    if (para === null) {
-        return `passou de ${de} a vazio`;
-    }
-
-    return `${de} → ${para}`;
-}
-
-function nomeDe(utilizadores: Array<{ id: string; nome: string }>, id: string): string {
-    return utilizadores.find((utilizador) => utilizador.id === id)?.nome ?? 'Utilizador removido';
 }

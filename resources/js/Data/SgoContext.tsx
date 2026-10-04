@@ -11,6 +11,7 @@ import type {
     Utilizador,
 } from '@/Data/types';
 import { temAcessoTotal } from '@/lib/rotulos';
+import { entradaDeCriacao, entradasDeAlteracao } from '@/lib/historico';
 
 /**
  * A camada de dados do SGO: TypeScript + Context, tudo em memória (D1).
@@ -170,20 +171,45 @@ export function ProvedorSgo({ children }: { children: ReactNode }) {
         [despesasAprovadas, estado.projectos],
     );
 
+    /**
+     * Criar um registo deixa rasto.
+     *
+     * A entrada de criação só é escrita para as colecções que a spec dá como
+     * históricas (§161): um acesso ou uma equipa corrigem-se à vontade e o que
+     * interessa é o estado final, não a sequência. Quem cria é quem está a ver
+     * a folha — o «ver como» muda o autor, senão o histórico apontaria para quem
+     * espreitou em vez de quem fez.
+     */
     const criar = useCallback(
         <N extends NomeColeccao>(coleccao: N, registo: EstadoSgo[N][number]) => {
             definirEstado((actual) => {
                 const lista = actual[coleccao] as unknown[];
+                const entrada = entradaDeCriacao(
+                    coleccao,
+                    registo as { id: string },
+                    utilizadorEfectivo.id,
+                    new Date().toISOString(),
+                );
 
                 return {
                     ...actual,
                     [coleccao]: [registo, ...lista],
+                    historico:
+                        entrada === null ? actual.historico : [...actual.historico, entrada],
                 } as EstadoSgo;
             });
         },
-        [],
+        [utilizadorEfectivo.id],
     );
 
+    /**
+     * Corrigir um registo deixa uma entrada por campo que mudou mesmo.
+     *
+     * A comparação é feita contra o registo como estava antes da gravação, e
+     * não contra o que o formulário traz: um campo que o formulário reenvia igual
+     * não é uma alteração, é o campo a ser lido. Escrevê-lo na mesma mudaria o
+     * número da revisão sem que nada tenha sido corrigido.
+     */
     const actualizar = useCallback(
         <N extends NomeColeccao>(
             coleccao: N,
@@ -192,16 +218,29 @@ export function ProvedorSgo({ children }: { children: ReactNode }) {
         ) => {
             definirEstado((actual) => {
                 const lista = actual[coleccao] as Array<{ id: string }>;
+                const anterior = lista.find((registo) => registo.id === id);
+                const entradas =
+                    anterior === undefined
+                        ? []
+                        : entradasDeAlteracao(
+                              actual,
+                              coleccao,
+                              anterior as Record<string, unknown>,
+                              alteracoes as Record<string, unknown>,
+                              utilizadorEfectivo.id,
+                              new Date().toISOString(),
+                          );
 
                 return {
                     ...actual,
                     [coleccao]: lista.map((registo) =>
                         registo.id === id ? { ...registo, ...alteracoes } : registo,
                     ),
+                    historico: [...actual.historico, ...entradas],
                 } as EstadoSgo;
             });
         },
-        [],
+        [utilizadorEfectivo.id],
     );
 
     const eliminar = useCallback(<N extends NomeColeccao>(coleccao: N, id: string) => {
