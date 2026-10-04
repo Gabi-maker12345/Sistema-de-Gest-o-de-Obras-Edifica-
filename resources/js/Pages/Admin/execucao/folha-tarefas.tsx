@@ -4,6 +4,8 @@ import { useOrdem } from '@/Components/brand/cabecalho-cota';
 import { useBusca } from '@/Components/brand/contexto-busca';
 import { FiltroChip, FiltrosFolha } from '@/Components/brand/filtros-folha';
 import { FolhaRegistos } from '@/Components/brand/folha-registos';
+import { GrelhaComMargem, MargemFicha } from '@/Components/brand/margem-ficha';
+import { TituloSelecao } from '@/Components/brand/titulo-selecao';
 import { EstadoSelo } from '@/Components/ui/badge';
 import { Botao } from '@/Components/ui/button';
 import { TextoLongo } from '@/Components/brand/texto-longo';
@@ -15,6 +17,7 @@ import { ROTULOS } from '@/lib/rotulos';
 import { cn } from '@/lib/utils';
 
 import { ModalTarefa } from '../ModalTarefa';
+import { FichaTarefa } from './ficha-tarefa';
 
 import { BotaoLimpar } from '@/Components/brand/botao-limpar';
 
@@ -41,8 +44,13 @@ export function FolhaTarefas({
     const { termo, limpar } = useBusca();
     const [actividadeId, definirActividade] = useState<string | null>(null);
     // A obra e, se houver uma, a actividade que o filtro já está a mostrar:
-    // abrir «+ Nova tarefa» a partir de uma actividade nascida com ela.
-    const [fichaAberta, definirFichaAberta] = useState(false);
+    // abrir «+ Nova tarefa» a partir de uma actividade nascida com ela. A mesma
+    // ficha, com a tarefa em vez de vazia, é a correcção que a margem abre.
+    const [ficha, definirFicha] = useState<{ aberta: boolean; tarefa: Tarefa | null }>({
+        aberta: false,
+        tarefa: null,
+    });
+    const [seleccionado, definirSeleccionado] = useState<string | null>(null);
     const { ordem, alternar, ordenar } = useOrdem<Tarefa>(COLUNAS, 'prazo');
 
     const actividades = useMemo(
@@ -75,6 +83,10 @@ export function FolhaTarefas({
 
     const atrasadas = linhas.filter(emAtraso);
     const abertas = linhas.filter((tarefa) => tarefa.estado !== 'concluida');
+
+    // Derivada das linhas visíveis: se o filtro mudar e a tarefa escolhida sair da
+    // lista, a ficha fecha-se em vez de ficar a mostrar um registo que já não se vê.
+    const escolhida = linhas.find((tarefa) => tarefa.id === seleccionado) ?? null;
 
     const limparFiltros = () => {
         definirActividade(null);
@@ -115,55 +127,66 @@ export function FolhaTarefas({
                 ))}
             </FiltrosFolha>
 
-            <FolhaRegistos<Tarefa>
-                titulo="Tarefas"
-                accoes={
-                    <Botao
-                        variante="primario"
-                        tamanho="sm"
-                        onClick={() => definirFichaAberta(true)}
-                    >
-                        + Nova tarefa
-                    </Botao>
-                }
-                ordem={ordem}
-                alternar={alternar}
-                colunas={COLUNAS}
-                grelha="grid-cols-[minmax(0,1fr)_96px_84px_96px_84px]"
-                linhas={linhas}
-                chaveDe={(tarefa) => tarefa.id}
-                vazio={
-                    actividadeId !== null || termo.trim().length > 0
-                        ? 'Nenhuma tarefa corresponde a este filtro.'
-                        : 'Este projecto ainda não tem tarefas registadas.'
-                }
-            >
-                {(tarefa) => {
-                    const responsavel = estado.utilizadores.find(
-                        (utilizador) => utilizador.id === tarefa.responsavelId,
-                    );
-                    const equipa = estado.equipas.find((e) => e.id === tarefa.equipaId);
-                    const atrasada = emAtraso(tarefa);
+            <GrelhaComMargem>
+                <FolhaRegistos<Tarefa>
+                    titulo="Tarefas"
+                    accoes={
+                        <Botao
+                            variante="primario"
+                            tamanho="sm"
+                            onClick={() => definirFicha({ aberta: true, tarefa: null })}
+                        >
+                            + Nova tarefa
+                        </Botao>
+                    }
+                    ordem={ordem}
+                    alternar={alternar}
+                    colunas={COLUNAS}
+                    grelha="grid-cols-[minmax(0,1fr)_96px_84px_96px_84px]"
+                    linhas={linhas}
+                    chaveDe={(tarefa) => tarefa.id}
+                    seleccionado={seleccionado}
+                    vazio={
+                        actividadeId !== null || termo.trim().length > 0
+                            ? 'Nenhuma tarefa corresponde a este filtro.'
+                            : 'Este projecto ainda não tem tarefas registadas.'
+                    }
+                >
+                    {(tarefa) => {
+                        const responsavel = estado.utilizadores.find(
+                            (utilizador) => utilizador.id === tarefa.responsavelId,
+                        );
+                        const equipa = estado.equipas.find((e) => e.id === tarefa.equipaId);
+                        const atrasada = emAtraso(tarefa);
 
-                    return (
-                        <div className="grid grid-cols-1 gap-2 px-3 py-3 md:grid-cols-[minmax(0,1fr)_96px_84px_96px_84px] md:items-center md:gap-3">
-                            <div className="min-w-0 space-y-1">
-                                <div className="flex flex-wrap items-center gap-x-2 gap-y-1">
-                                    <p className="truncate text-sm font-medium text-graphite">
-                                        {tarefa.titulo}
-                                    </p>
-                                    <EstadoSelo estado={tarefa.estado} tamanho="sm" />
-                                    {atrasada && (
-                                        <span className="cota text-red-pencil">em atraso</span>
+                        return (
+                            <div className="grid grid-cols-1 gap-2 px-3 py-3 md:grid-cols-[minmax(0,1fr)_96px_84px_96px_84px] md:items-center md:gap-3">
+                                <div className="min-w-0 space-y-1">
+                                    <div className="flex flex-wrap items-center gap-x-2 gap-y-1">
+                                        <TituloSelecao
+                                            chave={tarefa.id}
+                                            seleccionado={seleccionado === tarefa.id}
+                                            aoEscolher={(chave) =>
+                                                definirSeleccionado(
+                                                    chave === seleccionado ? null : chave,
+                                                )
+                                            }
+                                            className="text-sm font-medium"
+                                        >
+                                            {tarefa.titulo}
+                                        </TituloSelecao>
+                                        <EstadoSelo estado={tarefa.estado} tamanho="sm" />
+                                        {atrasada && (
+                                            <span className="cota text-red-pencil">em atraso</span>
+                                        )}
+                                    </div>
+
+                                    {tarefa.descricao.length > 0 && (
+                                        <TextoLongo
+                                            texto={tarefa.descricao}
+                                            className="text-xs text-graphite-64"
+                                        />
                                     )}
-                                </div>
-
-                                {tarefa.descricao.length > 0 && (
-                                    <TextoLongo
-                                        texto={tarefa.descricao}
-                                        className="text-xs text-graphite-64"
-                                    />
-                                )}
 
                                 <p className="cota">
                                     {ROTULOS.prioridade[tarefa.prioridade]}
@@ -182,9 +205,9 @@ export function FolhaTarefas({
                                 {responsavel?.nome ?? 'Sem responsável'}
                             </p>
 
-<p className="cota md:text-right tabular">
-                                    {Math.round(tarefa.percentagemConclusao)}%
-                                </p>
+                            <p className="cota tabular md:text-right">
+                                {Math.round(tarefa.percentagemConclusao)}%
+                            </p>
 
                             <p className="cota md:text-right">
                                 {tarefa.horasReais !== null ? `${tarefa.horasReais}h` : '—'}
@@ -201,13 +224,24 @@ export function FolhaTarefas({
                         </div>
                     );
                 }}
-            </FolhaRegistos>
+                </FolhaRegistos>
+
+                <MargemFicha comFicha={escolhida !== null}>
+                    {escolhida && (
+                        <FichaTarefa
+                            tarefa={escolhida}
+                            aoCorrigir={(tarefa) => definirFicha({ aberta: true, tarefa })}
+                            aoFechar={() => definirSeleccionado(null)}
+                        />
+                    )}
+                </MargemFicha>
+            </GrelhaComMargem>
 
             <ModalTarefa
-                aberto={fichaAberta}
-                tarefa={null}
+                aberto={ficha.aberta}
+                tarefa={ficha.tarefa}
                 comProjecto={projectoId}
-                aoFechar={() => definirFichaAberta(false)}
+                aoFechar={() => definirFicha({ aberta: false, tarefa: null })}
             />
         </div>
     );

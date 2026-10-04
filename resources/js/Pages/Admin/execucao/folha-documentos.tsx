@@ -2,6 +2,8 @@ import { useMemo, useState } from 'react';
 
 import { useBusca } from '@/Components/brand/contexto-busca';
 import { FolhaRegistos } from '@/Components/brand/folha-registos';
+import { GrelhaComMargem, MargemFicha } from '@/Components/brand/margem-ficha';
+import { TituloSelecao } from '@/Components/brand/titulo-selecao';
 import { useSgo } from '@/Data/SgoContext';
 import type { DocumentoSgo } from '@/Data/types';
 import { data, normalizar } from '@/lib/format';
@@ -11,11 +13,12 @@ import { BotaoLimpar } from '@/Components/brand/botao-limpar';
 import { Botao } from '@/Components/ui/button';
 
 import { ModalDocumento } from '../ModalDocumento';
+import { FichaDocumento } from './ficha-documento';
 
 /**
  * Os documentos do projecto.
  *
-* O que distingue esta lista das outras é a versão: re-anexar um ficheiro no
+ * O que distingue esta lista das outras é a versão: re-anexar um ficheiro no
  * mesmo registo não cria um documento novo, sobe o número (spec, Documentos).
  * Por isso a coluna escreve `v3` e diz quantas vezes o ficheiro foi
  * substituído — a pergunta real é «isto é a versão que assinámos?», e o número
@@ -25,6 +28,11 @@ import { ModalDocumento } from '../ModalDocumento';
  * a uma tarefa, a uma despesa ou a um fornecedor, e esse ficheiro não pertence
  * à pasta da obra — aparece na entidade a que está associado. Filtrar por
  * `projectoId` em vez de listar tudo é o que mantém a lista honesta.
+ *
+ * A margem da direita leva a ficha do anexo escolhido: a quem está preso, em que
+ * versão está e a cronologia de quem a subiu. Num anexo, a revisão é quase
+ * sempre a versão seguinte, e é a margem que diz isso em vez de o fazer
+ * deduzir do número.
  */
 export function FolhaDocumentos({
     projectoId,
@@ -34,7 +42,11 @@ export function FolhaDocumentos({
     className?: string;
 }) {
     const { estado } = useSgo();
-    const [fichaAberta, definirFichaAberta] = useState(false);
+    const [ficha, definirFicha] = useState<{ aberta: boolean; documento: DocumentoSgo | null }>({
+        aberta: false,
+        documento: null,
+    });
+    const [seleccionado, definirSeleccionado] = useState<string | null>(null);
     const { termo, limpar } = useBusca();
 
     const documentos = useMemo(() => {
@@ -52,75 +64,103 @@ export function FolhaDocumentos({
             .sort((a, b) => b.criadoEm.localeCompare(a.criadoEm));
     }, [estado.documentos, projectoId, termo]);
 
-return (
-            <>
+    const escolhido = documentos.find((documento) => documento.id === seleccionado) ?? null;
+
+    return (
+        <>
+            <GrelhaComMargem className={className}>
                 <FolhaRegistos<DocumentoSgo>
                     titulo="Documentos"
                     accoes={
                         <Botao
                             variante="primario"
                             tamanho="sm"
-                            onClick={() => definirFichaAberta(true)}
+                            onClick={() => definirFicha({ aberta: true, documento: null })}
                         >
                             + Anexar documento
                         </Botao>
                     }
-            contagem={
-                termo.trim().length > 0 ? (
-                    <BotaoLimpar aoLimpar={limpar} />
-                ) : (
-                    <span>{documentos.length} documentos</span>
-                )
-            }
-            ordem={{ coluna: 'criadoEm', sentido: 'desc' }}
-            alternar={() => undefined}
-            colunas={COLUNAS}
-            grelha="grid-cols-[minmax(0,1fr)_140px_88px_96px]"
-            linhas={documentos}
-            chaveDe={(documento) => documento.id}
-            vazio={
-                termo.trim().length > 0
-                    ? 'Nenhum documento corresponde a esta busca.'
-                    : 'Este projecto ainda não tem documentos.'
-            }
-            className={className}
-        >
-            {(documento) => {
-                const autor = estado.utilizadores.find(
-                    (utilizador) => utilizador.id === documento.uploadPor,
-                );
+                    contagem={
+                        termo.trim().length > 0 ? (
+                            <BotaoLimpar aoLimpar={limpar} />
+                        ) : (
+                            <span>{documentos.length} documentos</span>
+                        )
+                    }
+                    ordem={{ coluna: 'criadoEm', sentido: 'desc' }}
+                    alternar={() => undefined}
+                    colunas={COLUNAS}
+                    grelha="grid-cols-[minmax(0,1fr)_140px_88px_96px]"
+                    linhas={documentos}
+                    chaveDe={(documento) => documento.id}
+                    seleccionado={seleccionado}
+                    vazio={
+                        termo.trim().length > 0
+                            ? 'Nenhum documento corresponde a esta busca.'
+                            : 'Este projecto ainda não tem documentos.'
+                    }
+                >
+                    {(documento) => {
+                        const autor = estado.utilizadores.find(
+                            (utilizador) => utilizador.id === documento.uploadPor,
+                        );
 
-                return (
-                    <div className="grid grid-cols-1 gap-2 px-3 py-3 md:grid-cols-[minmax(0,1fr)_140px_88px_96px] md:items-center md:gap-3">
-                        <div className="min-w-0 space-y-1">
-                            <p className="truncate text-sm font-medium text-graphite">
-                                {documento.nomeFicheiro}
-                            </p>
-                            <p className="cota">
-                                {ROTULOS.tipoDocumento[documento.tipoDocumento]} ·{' '}
-                                {documento.tamanho}
-                                {documento.versao > 1 && ` · substituído ${documento.versao - 1}×`}
-                            </p>
-                        </div>
+                        return (
+                            <div className="grid grid-cols-1 gap-2 px-3 py-3 md:grid-cols-[minmax(0,1fr)_140px_88px_96px] md:items-center md:gap-3">
+                                <div className="min-w-0 space-y-1">
+                                    <TituloSelecao
+                                        chave={documento.id}
+                                        seleccionado={seleccionado === documento.id}
+                                        aoEscolher={(chave) =>
+                                            definirSeleccionado(
+                                                chave === seleccionado ? null : chave,
+                                            )
+                                        }
+                                        className="text-sm font-medium"
+                                    >
+                                        {documento.nomeFicheiro}
+                                    </TituloSelecao>
+                                    <p className="cota">
+                                        {ROTULOS.tipoDocumento[documento.tipoDocumento]} ·{' '}
+                                        {documento.tamanho}
+                                        {documento.versao > 1 &&
+                                            ` · substituído ${documento.versao - 1}×`}
+                                    </p>
+                                </div>
 
-                        <p className="cota truncate">{autor?.nome ?? '—'}</p>
+                                <p className="cota truncate">{autor?.nome ?? '—'}</p>
 
-                        <p className="cota tabular">v{documento.versao}</p>
+                                <p className="cota tabular">v{documento.versao}</p>
 
-                        <p className="cota tabular md:text-right">{data(documento.criadoEm)}</p>
-                    </div>
-                );
-}}
+                                <p className="cota tabular md:text-right">
+                                    {data(documento.criadoEm)}
+                                </p>
+                            </div>
+                        );
+                    }}
                 </FolhaRegistos>
 
-                <ModalDocumento
-                    aberto={fichaAberta}
-                    documento={null}
-                    aoFechar={() => definirFichaAberta(false)}
-                />
-            </>
-        );
-    }
+                <MargemFicha comFicha={escolhido !== null}>
+                    {escolhido && (
+                        <FichaDocumento
+                            documento={escolhido}
+                            aoCorrigir={(documento) =>
+                                definirFicha({ aberta: true, documento })
+                            }
+                            aoFechar={() => definirSeleccionado(null)}
+                        />
+                    )}
+                </MargemFicha>
+            </GrelhaComMargem>
+
+            <ModalDocumento
+                aberto={ficha.aberta}
+                documento={ficha.documento}
+                aoFechar={() => definirFicha({ aberta: false, documento: null })}
+            />
+        </>
+    );
+}
 
 const COLUNAS = [
     {

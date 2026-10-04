@@ -8,6 +8,8 @@
     EstadoProjecto,
     EstadoTarefa,
     ImpactoDecisao,
+    Material,
+    Pagamento,
     PapelProjecto,
     PerfilUtilizador,
     PrioridadeTarefa,
@@ -90,6 +92,24 @@ const ROTULOS = {
         pago: 'Pago',
     } satisfies Record<EstadoPagamento, string>,
 
+    metodoPagamento: {
+        transferencia: 'Transferência',
+        dinheiro: 'Dinheiro',
+        cheque: 'Cheque',
+        outro: 'Outro',
+    } satisfies Record<Pagamento['metodoPagamento'], string>,
+
+    unidadeMedida: {
+        un: 'unidade',
+        kg: 'kg',
+        m: 'metro',
+        m2: 'm²',
+        m3: 'm³',
+        l: 'litro',
+        saco: 'saco',
+        outro: 'outro',
+    } satisfies Record<Material['unidadeMedida'], string>,
+
     estadoDecisao: {
         pendente: 'Pendente',
         em_execucao: 'Em execução',
@@ -125,17 +145,17 @@ const ROTULOS = {
         outro: 'Outro',
     } satisfies Record<TipoDocumento, string>,
 
-  /**
-* A que se liga um anexo. A ordem é a da ficha: primeiro o tipo a que
+/**
+     * A que se liga um anexo. A ordem é a da ficha: primeiro o tipo a que
      * se liga, depois a entidade — invertida, a lista de entidades não se sabe de
      * que tabela tirar.
-   */
-  entidadeDocumento: {
-      projecto: 'Projecto',
-      tarefa: 'Tarefa',
-      despesa: 'Despesa',
-      fornecedor: 'Fornecedor',
-  } satisfies Record<EntidadeDocumento, string>,
+     */
+    entidadeDocumento: {
+        projecto: 'Projecto',
+        tarefa: 'Tarefa',
+        despesa: 'Despesa',
+        fornecedor: 'Fornecedor',
+    } satisfies Record<EntidadeDocumento, string>,
 
     tipoIndicador: {
         custo: 'Custo',

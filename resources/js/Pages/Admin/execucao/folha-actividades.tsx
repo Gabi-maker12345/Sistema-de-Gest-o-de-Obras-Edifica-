@@ -4,6 +4,8 @@ import { BotaoLimpar } from '@/Components/brand/botao-limpar';
 import { useOrdem } from '@/Components/brand/cabecalho-cota';
 import { useBusca } from '@/Components/brand/contexto-busca';
 import { FolhaRegistos } from '@/Components/brand/folha-registos';
+import { GrelhaComMargem, MargemFicha } from '@/Components/brand/margem-ficha';
+import { TituloSelecao } from '@/Components/brand/titulo-selecao';
 import { EstadoSelo } from '@/Components/ui/badge';
 import { Botao } from '@/Components/ui/button';
 import { Medidor } from '@/Components/ui/progress';
@@ -13,6 +15,7 @@ import { data, normalizar } from '@/lib/format';
 import { cn } from '@/lib/utils';
 
 import { ModalActividade } from '../ModalActividade';
+import { FichaActividade } from './ficha-actividade';
 
 /**
  * As actividades de um projecto.
@@ -31,6 +34,12 @@ import { ModalActividade } from '../ModalActividade';
  * fechar tarefas; aqui só se lê esse valor. Recalcular a média aqui repetiria a
  * regra noutro sítio, e as duas médias divergiriam no primeiro caso em que uma
  * actividade tem filhas com tarefas e a mãe não tem nenhuma.
+ *
+ * A margem da direita é a ficha da actividade escolhida, com o calendário
+ * previsto contra real e a cronologia de revisão. A escolha é derivada do que
+ * está visível — se a obra mudar ou a busca filtrar a actividade para fora, a
+ * ficha fecha-se sozinha em vez de ficar a mostrar um registo que já não está
+ * na lista.
  */
 export function FolhaActividades({
     projectoId,
@@ -44,8 +53,12 @@ export function FolhaActividades({
     const { ordem, alternar, ordenar } = useOrdem<Actividade>(COLUNAS, 'nome');
     // A obra já está escolhida nesta folha, por isso a ficha de criação abre com o
     // projecto preenchido e bloqueado — que é o que a spec pede para a actividade
-    // nascida aqui.
-    const [fichaAberta, definirFichaAberta] = useState(false);
+    // nascida aqui. A mesma ficha em modo de correcção é a que a margem abre.
+    const [ficha, definirFicha] = useState<{
+        aberta: boolean;
+        actividade: Actividade | null;
+    }>({ aberta: false, actividade: null });
+    const [seleccionado, definirSeleccionado] = useState<string | null>(null);
 
     const actividades = useMemo(
         () => estado.actividades.filter((actividade) => actividade.projectoId === projectoId),
@@ -80,113 +93,144 @@ export function FolhaActividades({
         ]);
     }, [visiveis, ordenar]);
 
+    const escolhida = linhas.find((actividade) => actividade.id === seleccionado) ?? null;
+
     const totalTarefas = tarefas.length;
     const concluidas = actividades.filter((actividade) => actividade.estado === 'concluida').length;
 
     return (
         <>
-            <FolhaRegistos<Actividade>
-                titulo="Actividades"
-                accoes={
-                    <Botao
-                        variante="primario"
-                        tamanho="sm"
-                        onClick={() => definirFichaAberta(true)}
-                    >
-                        + Nova actividade
-                    </Botao>
-                }
-            contagem={
-                termo.trim().length > 0 ? (
-                    <BotaoLimpar aoLimpar={limpar} />
-                ) : (
-                    <span>
-                        {actividades.length} actividades · {concluidas} concluídas ·{' '}
-                        {totalTarefas} tarefas
-                    </span>
-                )
-            }
-            ordem={ordem}
-            alternar={alternar}
-            colunas={COLUNAS}
-            grelha="grid-cols-[minmax(0,1fr)_140px_88px_132px]"
-            linhas={linhas}
-            chaveDe={(actividade) => actividade.id}
-            vazio={
-                termo.trim().length > 0
-                    ? 'Nenhuma actividade corresponde a esta busca.'
-                    : 'Este projecto ainda não tem actividades registadas.'
-            }
-            className={className}
-        >
-            {(actividade) => {
-                const filhas = actividades.filter(
-                    (outra) => outra.actividadePaiId === actividade.id,
-                );
-                const tarefasDaActividade = tarefas.filter(
-                    (tarefa) => tarefa.actividadeId === actividade.id,
-                );
-                const concluidasDaActividade = tarefasDaActividade.filter(
-                    (tarefa) => tarefa.estado === 'concluida',
-                ).length;
-
-                return (
-                    <div
-                        className={cn(
-                            'grid grid-cols-1 gap-2 px-3 py-3 md:grid-cols-[minmax(0,1fr)_140px_88px_132px] md:items-center md:gap-3',
-                            actividade.actividadePaiId !== null && 'border-l-2 border-graphite-20 pl-5',
-                        )}
-                    >
-                        <div className="min-w-0 space-y-1">
-                            <div className="flex flex-wrap items-center gap-x-2 gap-y-1">
-                                <p
-                                    className={cn(
-                                        'truncate text-sm',
-                                        actividade.actividadePaiId === null
-                                            ? 'font-medium text-graphite'
-                                            : 'text-graphite-64',
-                                    )}
-                                >
-                                    {actividade.nome}
-                                </p>
-                                <EstadoSelo estado={actividade.estado} tamanho="sm" />
-                            </div>
-
-                            {actividade.descricao.length > 0 && (
-                                <p className="line-clamp-2 text-xs text-graphite-64">
-                                    {actividade.descricao}
-                                </p>
-                            )}
-
-                            <p className="cota">
-                                {filhas.length > 0 &&
-                                    `${filhas.length} subactividade${filhas.length === 1 ? '' : 's'} · `}
-                                {tarefasDaActividade.length === 0
-                                    ? 'sem tarefas'
-                                    : `${concluidasDaActividade}/${tarefasDaActividade.length} tarefas fechadas`}
-                            </p>
-                        </div>
-
-                        <div className="flex items-center gap-2">
-                            <Medidor valor={actividade.percentagemConclusao} className="flex-1" />
-                            <span className="cota w-8 text-right tabular">
-                                {Math.round(actividade.percentagemConclusao)}%
+            <GrelhaComMargem className={className}>
+                <FolhaRegistos<Actividade>
+                    titulo="Actividades"
+                    accoes={
+                        <Botao
+                            variante="primario"
+                            tamanho="sm"
+                            onClick={() =>
+                                definirFicha({ aberta: true, actividade: null })
+                            }
+                        >
+                            + Nova actividade
+                        </Botao>
+                    }
+                    contagem={
+                        termo.trim().length > 0 ? (
+                            <BotaoLimpar aoLimpar={limpar} />
+                        ) : (
+                            <span>
+                                {actividades.length} actividades · {concluidas} concluídas ·{' '}
+                                {totalTarefas} tarefas
                             </span>
-                        </div>
+                        )
+                    }
+                    ordem={ordem}
+                    alternar={alternar}
+                    colunas={COLUNAS}
+                    grelha="grid-cols-[minmax(0,1fr)_140px_88px_132px]"
+                    linhas={linhas}
+                    chaveDe={(actividade) => actividade.id}
+                    seleccionado={seleccionado}
+                    vazio={
+                        termo.trim().length > 0
+                            ? 'Nenhuma actividade corresponde a esta busca.'
+                            : 'Este projecto ainda não tem actividades registadas.'
+                    }
+                >
+                    {(actividade) => {
+                        const filhas = actividades.filter(
+                            (outra) => outra.actividadePaiId === actividade.id,
+                        );
+                        const tarefasDaActividade = tarefas.filter(
+                            (tarefa) => tarefa.actividadeId === actividade.id,
+                        );
+                        const concluidasDaActividade = tarefasDaActividade.filter(
+                            (tarefa) => tarefa.estado === 'concluida',
+                        ).length;
 
-                        <p className="cota md:text-right">{data(actividade.dataInicioPrevista)}</p>
+                        return (
+                            <div
+                                className={cn(
+                                    'grid grid-cols-1 gap-2 px-3 py-3 md:grid-cols-[minmax(0,1fr)_140px_88px_132px] md:items-center md:gap-3',
+                                    actividade.actividadePaiId !== null &&
+                                        'border-l-2 border-graphite-20 pl-5',
+                                )}
+                            >
+                                <div className="min-w-0 space-y-1">
+                                    <div className="flex flex-wrap items-center gap-x-2 gap-y-1">
+                                        <TituloSelecao
+                                            chave={actividade.id}
+                                            seleccionado={seleccionado === actividade.id}
+                                            aoEscolher={(chave) =>
+                                                definirSeleccionado(
+                                                    chave === seleccionado ? null : chave,
+                                                )
+                                            }
+                                            className={cn(
+                                                'text-sm',
+                                                actividade.actividadePaiId === null
+                                                    ? 'font-medium'
+                                                    : 'font-normal text-graphite-64',
+                                            )}
+                                        >
+                                            {actividade.nome}
+                                        </TituloSelecao>
+                                        <EstadoSelo estado={actividade.estado} tamanho="sm" />
+                                    </div>
 
-                        <p className="cota md:text-right">{leituraFim(actividade)}</p>
-                    </div>
-                );
-            }}
-            </FolhaRegistos>
+                                    {actividade.descricao.length > 0 && (
+                                        <p className="line-clamp-2 text-xs text-graphite-64">
+                                            {actividade.descricao}
+                                        </p>
+                                    )}
+
+                                    <p className="cota">
+                                        {filhas.length > 0 &&
+                                            `${filhas.length} subactividade${filhas.length === 1 ? '' : 's'} · `}
+                                        {tarefasDaActividade.length === 0
+                                            ? 'sem tarefas'
+                                            : `${concluidasDaActividade}/${tarefasDaActividade.length} tarefas fechadas`}
+                                    </p>
+                                </div>
+
+                                <div className="flex items-center gap-2">
+                                    <Medidor
+                                        valor={actividade.percentagemConclusao}
+                                        className="flex-1"
+                                    />
+                                    <span className="cota w-8 text-right tabular">
+                                        {Math.round(actividade.percentagemConclusao)}%
+                                    </span>
+                                </div>
+
+                                <p className="cota md:text-right">
+                                    {data(actividade.dataInicioPrevista)}
+                                </p>
+
+                                <p className="cota md:text-right">{leituraFim(actividade)}</p>
+                            </div>
+                        );
+                    }}
+                </FolhaRegistos>
+
+                <MargemFicha comFicha={escolhida !== null}>
+                    {escolhida && (
+                        <FichaActividade
+                            actividade={escolhida}
+                            aoCorrigir={(actividade) =>
+                                definirFicha({ aberta: true, actividade })
+                            }
+                            aoFechar={() => definirSeleccionado(null)}
+                        />
+                    )}
+                </MargemFicha>
+            </GrelhaComMargem>
 
             <ModalActividade
-                aberto={fichaAberta}
-                actividade={null}
+                aberto={ficha.aberta}
+                actividade={ficha.actividade}
                 comProjecto={projectoId}
-                aoFechar={() => definirFichaAberta(false)}
+                aoFechar={() => definirFicha({ aberta: false, actividade: null })}
             />
         </>
     );

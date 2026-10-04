@@ -31,6 +31,7 @@ export function FolhaRegistos<L>({
     vazio,
     contagem,
     accoes,
+    seleccionado,
     className,
 }: {
     titulo: string;
@@ -44,24 +45,31 @@ export function FolhaRegistos<L>({
     children: (linha: L, indice: number) => ReactNode;
     /** O texto do estado sem registo, já distinguindo filtro de sessão vazia. */
     vazio: string;
-contagem?: ReactNode;
-      /**
-       * O que fica no canto da folha, à direita da contagem: o botão de criar
-       * que a spec pede em todos os módulos de registo. Vem como nó para a
-       * folha continuar a não saber o que se cria — só onde abrir a ficha.
-       */
-      accoes?: ReactNode;
-      className?: string;
+    /** A contagem à direita do título: quantas linhas a folha está a mostrar. */
+    contagem?: ReactNode;
+    /**
+     * O que fica no canto da folha, à direita da contagem: o botão de criar
+     * que a spec pede em todos os módulos de registo. Vem como nó para a
+     * folha continuar a não saber o que se cria — só onde abrir a ficha.
+     */
+    accoes?: ReactNode;
+    /**
+     * A chave da linha que está aberta na margem, se alguma. A folha não sabe
+     * o que há na margem — só que há uma linha em foco, e escreve-a com o
+     * filete de carimbo que diz «esta é a folha que está em cima da mesa».
+     */
+    seleccionado?: string | null;
+    className?: string;
 }) {
     return (
         <section className={cn('space-y-2', className)}>
-<div className="flex flex-wrap items-end justify-between gap-3 border-b border-graphite-32 pb-2">
-              <h2 className="cota text-graphite">{titulo}</h2>
-              <div className="flex flex-wrap items-center gap-3">
-                  {contagem && <p className="cota">{contagem}</p>}
-                  {accoes}
-              </div>
-          </div>
+            <div className="flex flex-wrap items-end justify-between gap-3 border-b border-graphite-32 pb-2">
+                <h2 className="cota text-graphite">{titulo}</h2>
+                <div className="flex flex-wrap items-center gap-3">
+                    {contagem && <p className="cota">{contagem}</p>}
+                    {accoes}
+                </div>
+            </div>
 
             {linhas.length === 0 ? (
                 <p className="border border-dashed border-graphite-32 p-6 text-sm text-graphite-64">
@@ -84,11 +92,30 @@ contagem?: ReactNode;
                     />
 
                     <ul className="border-x border-b border-graphite-32">
-                        {linhas.map((linha, indice) => (
-                            <li key={chaveDe(linha)} className="border-b border-graphite-20 last:border-0">
-                                {children(linha, indice)}
-                            </li>
-                        ))}
+                        {linhas.map((linha, indice) => {
+                            const chave = chaveDe(linha);
+                            const emFoco = seleccionado === chave;
+
+                            return (
+                                <li
+                                    key={chave}
+                                    aria-current={emFoco ? 'true' : undefined}
+                                    className={cn(
+                                        'relative border-b border-graphite-20 last:border-0',
+                                        emFoco && 'bg-stamp-08',
+                                    )}
+                                >
+                                    {emFoco && (
+                                        <span
+                                            aria-hidden
+                                            className="absolute inset-y-0 left-0 w-0.5 bg-stamp"
+                                        />
+                                    )}
+
+                                    {children(linha, indice)}
+                                </li>
+                            );
+                        })}
                     </ul>
                 </>
             )}
