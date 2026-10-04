@@ -1,0 +1,87 @@
+{
+  "title": "Os quatro módulos de execução: que estrutura?",
+  "question": "O sorteio dealt 4, 1 e 5 da lista fundamentada; o índice 4 lidera. Mantém, toma uma alternativa, ou volta a sortear. A gaveta persistente no cabeçalho e a margem de revisão à direita já estão decididas — esta ronda decide só o corpo de cada folha.",
+  "options": [
+    {
+      "id": "instrumento",
+      "label": "Cada módulo é o seu próprio instrumento",
+      "kicker": "THE ROLL",
+      "lineage": "prancha técnica plotada — carimbo, revisão, hachura 45°",
+      "thesis": "Uma folha, um instrumento: as actividades são uma espinha de prazo com a régua de hoje, o diário é um livro pautado por dia, as fotografias são uma folha de contactos e os documentos são um braço de versões — mesma tábua, quatro desenhos que não se confundem.",
+      "palette": ["#E9EDEA", "#15181A", "#31409E", "#D98A0B", "#B4321C"],
+      "materials": ["papel de plotter", "hachura 45°/90°", "tinta de carimbo", "régua de corte"],
+      "viewport": "Gaveta da obra em toda a largura; à esquerda o instrumento do módulo com a acção âmbar em cima; à direita a margem de revisão aberta com a ficha do registo seleccionado.",
+      "risk": "Exige quatro desenhos realmente diferentes e não uma tabela com quatro filtros; se as formas ficarem parecidas, a diferenciação é só cosmética.",
+      "raised": [
+        { "from": "mapa de orientação", "raise": "A actividade deixa de ser uma linha e passa a ser um controlo: círculo sobre o terreno-prazo e linha de chamada com o estado codificado." },
+        { "from": "painel split-flap", "raise": "Mudar o estado reestiliza a linha e nunca move a grelha; a coluna não se desloca quando um dia atrasa." },
+        { "from": "manual de referência com acetato", "raise": "A versão de um documento é uma camada: a vigente é a única folha transparente e a pendente fica meio articulada." }
+      ],
+      "wireframe": {
+        "cols": 12,
+        "rows": 10,
+        "regions": [
+          { "label": "gaveta da obra: carimbo, estado, execução, troca", "x": 0, "y": 0, "w": 12, "h": 1, "accent": true },
+          { "label": "acção primária âmbar", "x": 0, "y": 1, "w": 2, "h": 1 },
+          { "label": "h1 do módulo e cota da folha", "x": 2, "y": 1, "w": 5, "h": 1 },
+          { "label": "instrumento: espinha, livro, contactos, versões", "x": 0, "y": 2, "w": 8, "h": 8, "accent": true },
+          { "label": "legenda de estados por peso de traço", "x": 0, "y": 2, "w": 8, "h": 1 },
+          { "label": "margem de revisão: ficha, criar, corrigir", "x": 8, "y": 2, "w": 4, "h": 8, "accent": true }
+        ]
+      }
+    },
+    {
+      "id": "caderno",
+      "label": "Caderno por obra, quatro lentes",
+      "kicker": "ALTERNATIVA",
+      "lineage": "livro de obra pautado, prova em três vias",
+      "thesis": "A gaveta é um caderno contínuo por obra e os quatro módulos são quatro lentes sobre o mesmo caderno: cada dia do diário traz as fotografias e os anexos que lhe pertencem.",
+      "palette": ["#E9EDEA", "#15181A", "#31409E", "#D98A0B", "#B4321C"],
+      "materials": ["papel pautado", "hachura 45°", "tinta de carimbo"],
+      "viewport": "A espinha das actividades em toda a largura; abaixo, a coluna dos dias em descendente com as fotografias dentro dos dias e os anexos à direita de cada dia.",
+      "risk": "Desloca a pergunta «o que há nesta obra?» para «o que aconteceu até hoje?» e põe o diário à frente da folha de actividades; o índice de folhas deixa de prometer quatro instrumentos.",
+      "case": "Funde bem: liga registos que hoje vivem isolados. Perde na clareza do produto — um módulo deixa de corresponder a um só tipo de registo.",
+      "wireframe": {
+        "cols": 12,
+        "rows": 10,
+        "regions": [
+          { "label": "gaveta da obra e as quatro lentes", "x": 0, "y": 0, "w": 12, "h": 1, "accent": true },
+          { "label": "espinha das actividades sobre o prazo", "x": 0, "y": 1, "w": 12, "h": 2, "accent": true },
+          { "label": "dias do diário, o mais recente em cima", "x": 0, "y": 3, "w": 6, "h": 7, "accent": true },
+          { "label": "fotografias dentro do dia", "x": 6, "y": 3, "w": 6, "h": 4, "accent": true },
+          { "label": "documentos anexados ao dia", "x": 6, "y": 7, "w": 6, "h": 3 }
+        ]
+      }
+    },
+    {
+      "id": "gramatica",
+      "label": "Uma gramática só, bem feita",
+      "kicker": "CONTROLO",
+      "lineage": "folha de cota — a cota sobre as colunas, uma linha por registo",
+      "thesis": "Os quatro módulos ficam com a mesma gramática de registo denso e o mesmo painel de ficha; o que muda entre eles é a cotação, não a forma.",
+      "palette": ["#E9EDEA", "#15181A", "#31409E", "#D98A0B", "#B4321C"],
+      "materials": ["papel de plotter", "hachura 45°", "tinta de carimbo"],
+      "viewport": "Capa igual nos quatro módulos, gaveta da obra no lugar do selector, e a mesma folha de registos por baixo com a ficha à direita.",
+      "risk": "É o que existe hoje com a escrita limpa: acrescenta criação e ficha sem resolver a repetição que motivou a remodelação.",
+      "case": "Menor risco e menor ganho. Resolve a funcionalidade, não a identidade.",
+      "wireframe": {
+        "cols": 12,
+        "rows": 10,
+        "regions": [
+          { "label": "capa idêntica nos quatro módulos", "x": 0, "y": 0, "w": 12, "h": 3, "accent": true },
+          { "label": "gaveta da obra na tábua", "x": 8, "y": 1, "w": 4, "h": 2 },
+          { "label": "uma folha de registos para os quatro", "x": 0, "y": 3, "w": 8, "h": 7, "accent": true },
+          { "label": "ficha do registo à direita", "x": 8, "y": 3, "w": 4, "h": 7 }
+        ]
+      }
+    }
+  ],
+  "reroll": {
+    "registers": ["safer", "bolder"]
+  },
+  "buildPath": {
+    "value": "code",
+    "toggle": false
+  },
+  "steer": true
+}
