@@ -169,7 +169,7 @@ export default function MinhasTarefas() {
 
     return (
         <LayoutAdmin>
-            <Head title="As minhas tarefas — SGO">
+            <Head title="As minhas tarefas">
                 <meta
                     name="description"
                     content="As tarefas atribuídas ao utilizador, de todas as obras, em quadro ou em lista."

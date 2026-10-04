@@ -132,7 +132,7 @@ export default function Projectos() {
 
     return (
         <LayoutAdmin>
-            <Head title="Projectos — SGO">
+            <Head title="Projectos">
                 <meta
                     name="description"
                     content="Espelho de datas dos projectos: a janela de cada obra contra o calendário, com as duas execuções e o desvio."

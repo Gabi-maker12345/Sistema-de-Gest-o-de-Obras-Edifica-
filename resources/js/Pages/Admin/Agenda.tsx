@@ -143,7 +143,7 @@ export default function Agenda() {
 
     return (
         <LayoutAdmin>
-            <Head title="Agenda — SGO">
+            <Head title="Agenda">
                 <meta
                     name="description"
                     content="Agenda de projectos, obra e compromissos pessoais, em vista de mês, semana ou lista."

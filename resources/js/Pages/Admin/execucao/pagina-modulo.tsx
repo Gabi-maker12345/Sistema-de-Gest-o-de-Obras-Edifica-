@@ -1,165 +1,172 @@
+import { Head } from '@inertiajs/react';
 import type { ReactNode } from 'react';
-import { useMemo, useState } from 'react';
+import { useState } from 'react';
 
+import { BarraObras } from '@/Components/brand/barra-obras';
 import { CabecalhoFolha } from '@/Components/brand/cabecalho-folha';
-import { Combo, type OpcaoCombo } from '@/Components/ui/combobox';
+import { CapaObra } from '@/Components/brand/capa-obra';
+import { Carimbo } from '@/Components/brand/carimbo';
 import type { Medicao } from '@/Components/brand/quadro-medicoes';
 import type { Projecto } from '@/Data/types';
+import { dataExtenso } from '@/lib/format';
+
+import { IndiceObras } from './indice-obras';
 
 /**
  * A casca de um módulo de registo de campo.
  *
- * Diário de obra, Fotografias e Documentos são módulos do índice — folhas com
- * rota, ao lado de Projectos e Equipas — mas o registo que mostram é de uma
- * obra, não do painel. Por isso o módulo abre com a obra escolhida: sem ela não
- * há diário para ler, e inventar um «diário do painel» seria uma folha que
- * ninguém consegue preencher.
+ * Diário de obra, Fotografias, Documentos e Actividades são folhas do índice — com
+ * rota, ao lado de Projectos e Equipas — mas o registo que mostram é de uma obra,
+ * não do painel. Por isso a casca tem de responder a duas perguntas antes do
+ * registo: «que obra é esta?» e «o que há nela?».
  *
- * A escolha fica em `projectoId` no estado local e não na rota. É a mesma
- * decisão de `/admin/agenda`: o módulo é uma folha, e o que se está a ler
- * dentro dela é uma escolha de quem olha, não um endereço para onde se vai.
+ * A resposta é a barra de estações em cima e a capa em baixo. Entre as duas, o
+ * módulo tem a mesma gramática dos cadastros: cabeçalho de folha, bloco de
+ * título sobre a tábua, e o carimbo que diz a que pasta e a que obra pertence o
+ * que está a ser lido.
+ *
+ * A escolha fica em `projectoId` no estado local e não na rota, a mesma decisão
+ * de `/admin/agenda`: o módulo é uma folha e o que se está a ler dentro dela é
+ * uma escolha de quem olha, não um endereço para onde se vai. Em troca, a obra
+ * escolhida é sempre uma obra visível ao utilizador — a barra só oferece as que a
+ * aba Acessos lhe dá.
  */
 export function PaginaModulo({
     modulo,
     titulo,
+    folha,
     linha,
     anotacao,
     projectos,
-    folha,
     contar,
-    porSincronizar,
+    contarPorSubir,
+    medicoes,
+    leituras,
+    carimbo,
     children,
 }: {
     modulo: string;
     titulo: string;
-    linha: string;
-    anotacao?: string;
-    projectos: Projecto[];
+    /** A folha do índice de folhas, tal como está cotada no índice. */
     folha: string;
-    /** Quantos registos o módulo tem nesta obra — decide quem aparece no índice. */
+    linha: ReactNode;
+    anotacao?: ReactNode;
+    /** Só as obras visíveis ao utilizador efectivo. */
+    projectos: Projecto[];
+    /** Quantos registos o módulo tem nesta obra. */
     contar: (projectoId: string) => number;
-    /** Registos ainda por subir. Fica de fora quando o módulo não tem sincronização. */
-    porSincronizar?: number;
+    /**
+     * Quantos registos ainda não subiram, na obra indicada ou em todas.
+     * `null` é todas as obras. Fica de fora quando o módulo não tem
+     * sincronização: num módulo sem ela a medida seria um zero que parece um
+     * estado, e não é.
+     */
+    contarPorSubir?: (projectoId: string | null) => number;
+    /** As seis medidas do módulo inteiro, que o bloco de título do desenho leva. */
+    medicoes: Medicao[];
+    /** As quatro medidas do módulo numa obra, que a capa leva. */
+    leituras: (projectoId: string) => Medicao[];
+    /** A identidade do carimbo: a que pasta e a que folha pertence o registo. */
+    carimbo: string;
     children: (projecto: Projecto) => ReactNode;
 }) {
     const [projectoId, definirProjectoId] = useState<string | null>(null);
 
-    const opcoes = useMemo<OpcaoCombo[]>(
-        () => projectos.map((projecto) => ({ valor: projecto.id, rotulo: projecto.nome })),
-        [projectos],
-    );
-
     const projecto = projectos.find((p) => p.id === projectoId) ?? null;
 
-    /**
-     * As medidas da capa saem do mesmo `contar` que a folha, ou a capa anuncia
-     * um número e a folha mostra outro — e é a capa que se lê primeiro.
-     *
-     * «Por sincronizar» só entra quando o módulo tem sincronização. Num módulo
-     * sem ela, a medida seria um zero que parece um estado e não é.
-     */
-    const medicoes = useMemo(() => {
-        const lista: Medicao[] = [
-            { rotulo: 'Obras', valor: String(projectos.length) },
-            {
-                rotulo: 'Registos',
-                valor: String(projectos.reduce((soma, p) => soma + contar(p.id), 0)),
-            },
-        ];
-
-        return porSincronizar === undefined
-            ? lista
-            : [
-                  ...lista,
-                  {
-                      rotulo: 'Por sincronizar',
-                      valor: String(porSincronizar),
-                      critico: porSincronizar > 0,
-                  },
-              ];
-    }, [projectos, contar, porSincronizar]);
+    // A obra escolhida é derivada, não guardada: se ela desaparecer dos acessos
+    // enquanto a folha está aberta, `projectoId` aponta para o vazio e a folha
+    // volta ao índice sem precisar de ser avisada de nada.
+    const activo = projecto === null ? null : projecto.id;
+    const registos = projecto === null ? null : contar(projecto.id);
+    const aSubir = contarPorSubir?.(activo);
 
     return (
-        <div className="space-y-12">
-            <CabecalhoFolha
-                cota={`Pasta de obra · ${modulo}`}
-                titulo={titulo}
-                linha={linha}
-                anotacao={anotacao}
-                folha={folha}
-                medicoes={medicoes}
-            />
+        <>
+            {/* O `Head` recebe o assunto pelado: o template de título do `app.tsx`
+                acrescenta o nome da aplicação, e escrever `— SGO` aqui punha a
+                marca duas vezes no separador do navegador. */}
+            <Head title={titulo}>
+                <meta
+                    name="description"
+                    content={`${modulo}: registo de obra a obra, com as medidas do módulo em cabeçalho e em capa.`}
+                />
+            </Head>
 
-            <div className="space-y-6">
-                <div className="flex flex-wrap items-end gap-3">
-                    <div className="w-72">
-                        <Combo
-                            valor={projectoId}
-                            opcoes={opcoes}
+            <div className="mx-auto max-w-7xl px-4 pt-8 pb-12 sm:px-6">
+                <div className="space-y-12">
+                    <CabecalhoFolha
+                        cota={`Pasta de obra · ${modulo}`}
+                        titulo={titulo}
+                        linha={linha}
+                        anotacao={anotacao}
+                        folha={folha}
+                        medicoes={medicoes}
+                    />
+
+                    <div className="space-y-6">
+                        <BarraObras
+                            obras={projectos}
+                            contar={contar}
+                            activo={activo}
                             aoEscolher={definirProjectoId}
-                            vazio="Nenhum projecto visível a este utilizador."
-                            placeholder="Escolher a obra…"
                         />
+
+                        {projecto === null ? (
+                            <IndiceObras
+                                obras={projectos}
+                                contar={contar}
+                                porSubir={contarPorSubir}
+                                aoEscolher={definirProjectoId}
+                            />
+                        ) : (
+                            <div className="space-y-12">
+                                <CapaObra projecto={projecto} leituras={leituras(projecto.id)} />
+
+                                {children(projecto)}
+                            </div>
+                        )}
                     </div>
 
-                    {projecto !== null && (
-                        <p className="cota pb-2">
-                            A mostrar o registo de{' '}
-                            <span className="font-medium text-graphite">{projecto.nome}</span>.
-                        </p>
-                    )}
+                    <Carimbo
+                        identidade={carimbo}
+                        className="w-[280px]"
+                        linhas={[
+                            { chave: 'Emitido', valor: dataExtenso(new Date()) },
+                            { chave: 'Revisão', valor: 'C' },
+                            {
+                                chave: 'Obra',
+                                valor: projecto === null ? '— todas as visíveis' : projecto.nome,
+                            },
+                            {
+                                chave: 'Registos',
+                                valor:
+                                    registos === null
+                                        ? `${projectos.reduce((soma, p) => soma + contar(p.id), 0)} em todas`
+                                        : `${registos} nesta obra`,
+                            },
+                            ...(aSubir && aSubir > 0
+                                ? [
+                                      {
+                                          chave: 'Por subir',
+                                          valor: `${aSubir} ${projecto === null ? 'em todas' : 'nesta obra'}`,
+                                      },
+                                  ]
+                                : []),
+                        ]}
+                        rodado={-2}
+                    />
                 </div>
 
-                {projecto !== null ? children(projecto) : <EscolherObra projectos={projectos} contar={contar} />}
+                {/* A obra em leitura muda por clique e pelas setas, e nada na folha se
+                    move: sem isto, quem navega por separadoras ouve um separador
+                    seleccionado e não sabe que obra ficou aberta. */}
+                <p className="sr-only" aria-live="polite">
+                    {projecto === null
+                        ? `Índice das obras. ${projectos.length} obras visíveis.`
+                        : `Obra em leitura: ${projecto.nome}. ${registos} registos neste módulo.`}
+                </p>
             </div>
-        </div>
-    );
-}
-
-/**
- * O estado vazio: as obras visíveis que têm registo, uma por linha.
- *
- * Uma lista de nomes não ajuda a escolher, e o módulo é o caso em que não se
- * sabe o que há dentro de cada obra. Cada linha por isso diz quantos registos
- * existem, e as obras sem registo ficam de fora: uma obra sem diário não é um
- * destino.
- */
-function EscolherObra({
-    projectos,
-    contar,
-}: {
-    projectos: Projecto[];
-    contar: (projectoId: string) => number;
-}) {
-    const linhas = useMemo(
-        () =>
-            projectos
-                .map((projecto) => ({ projecto, registos: contar(projecto.id) }))
-                .filter((linha) => linha.registos > 0),
-        [projectos, contar],
-    );
-
-    if (linhas.length === 0) {
-        return (
-            <p className="hachura-90 border border-graphite-20 p-8 text-center text-sm text-graphite-64">
-                Nenhuma obra visível a este utilizador tem registo neste módulo.
-            </p>
-        );
-    }
-
-    return (
-        <ul className="border border-graphite-32">
-            {linhas.map((linha) => (
-                <li
-                    key={linha.projecto.id}
-                    className="flex items-baseline justify-between gap-3 border-b border-graphite-20 px-4 py-3 last:border-0"
-                >
-                    <span className="text-sm text-graphite">{linha.projecto.nome}</span>
-                    <span className="cota tabular">
-                        {linha.registos} {linha.registos === 1 ? 'registo' : 'registos'}
-                    </span>
-                </li>
-            ))}
-        </ul>
+        </>
     );
 }

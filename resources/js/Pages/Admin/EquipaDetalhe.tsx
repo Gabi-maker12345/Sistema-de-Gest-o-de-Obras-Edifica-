@@ -77,7 +77,7 @@ export default function EquipaDetalhe({ id }: { id: string }) {
 
     return (
         <LayoutAdmin>
-            <Head title={`${equipa.nome} — SGO`}>
+            <Head title={equipa.nome}>
                 <meta name="description" content={`Ficha da equipa ${equipa.nome}.`} />
             </Head>
 
@@ -318,7 +318,7 @@ export default function EquipaDetalhe({ id }: { id: string }) {
 function EquipaInexistente({ id }: { id: string }) {
     return (
         <LayoutAdmin>
-            <Head title="Equipa não encontrada — SGO" />
+            <Head title="Equipa não encontrada" />
             <div className="mx-auto max-w-3xl px-4 py-16 sm:px-6">
                 <Folha traco="carimbado">
                     <FolhaCabecalho>

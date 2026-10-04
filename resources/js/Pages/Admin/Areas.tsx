@@ -1,4 +1,4 @@
-﻿import { Head } from '@inertiajs/react';
+import { Head } from '@inertiajs/react';
 import { Pencil, Plus } from 'lucide-react';
 import { useMemo, useState } from 'react';
 
@@ -98,7 +98,7 @@ export default function Areas() {
 
     return (
         <LayoutAdmin>
-            <Head title="Áreas — SGO">
+            <Head title="Áreas">
                 <meta
                     name="description"
                     content="As frentes da obra e quem responde por cada uma."

@@ -27,7 +27,7 @@ import { toast } from '@/Components/ui/toaster';
 export default function Login() {
     return (
         <LayoutAuth>
-            <Head title="Entrar — SGO">
+            <Head title="Entrar">
                 <meta
                     name="description"
                     content="Entrar no painel do SGO. Autenticação real; o selector «Ver como» escolhe os dados visíveis."

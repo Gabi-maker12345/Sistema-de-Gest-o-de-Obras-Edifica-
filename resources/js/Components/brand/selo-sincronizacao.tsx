@@ -55,7 +55,7 @@ export function SeloSincronizacao({
  * que falta é a viagem. Desenhada com o traço actual do selo para não pesar o
  * texto pequeno a que pertence.
  */
-function NuvemCortada() {
+export function NuvemCortada() {
     return (
         <svg
             viewBox="0 0 16 16"

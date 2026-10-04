@@ -1,4 +1,4 @@
-﻿import { Head, Link } from '@inertiajs/react';
+import { Head, Link } from '@inertiajs/react';
 import { Pencil, Plus } from 'lucide-react';
 import { useMemo, useState } from 'react';
 
@@ -107,7 +107,7 @@ export default function Equipas() {
 
     return (
         <LayoutAdmin>
-            <Head title="Equipas — SGO">
+            <Head title="Equipas">
                 <meta
                     name="description"
                     content="As equipas de execução, o projecto a que pertencem e quem está no livro."

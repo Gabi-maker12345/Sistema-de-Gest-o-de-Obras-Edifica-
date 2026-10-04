@@ -1,4 +1,4 @@
-﻿import { Head } from '@inertiajs/react';
+import { Head } from '@inertiajs/react';
 import { ArrowDown, ArrowUp } from 'lucide-react';
 import { useMemo } from 'react';
 import { Bar, BarChart, CartesianGrid, ReferenceLine, XAxis, YAxis } from 'recharts';
@@ -91,7 +91,7 @@ export default function Dashboard() {
 
     return (
         <LayoutAdmin>
-            <Head title="Painel — SGO">
+            <Head title="Painel">
                 <meta
                     name="description"
                     content="Painel de gestão de projectos, obras e trabalho do SGO."

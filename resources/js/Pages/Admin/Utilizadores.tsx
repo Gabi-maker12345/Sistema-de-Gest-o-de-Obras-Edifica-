@@ -1,4 +1,4 @@
-﻿import { Head } from '@inertiajs/react';
+import { Head } from '@inertiajs/react';
 import { Pencil, Plus } from 'lucide-react';
 import { useMemo, useState } from 'react';
 
@@ -99,7 +99,7 @@ export default function Utilizadores() {
 
     return (
         <LayoutAdmin>
-            <Head title="Utilizadores — SGO">
+            <Head title="Utilizadores">
                 <meta
                     name="description"
                     content="Quem trabalha na obra, com que perfil global e com que projectos atribuídos."

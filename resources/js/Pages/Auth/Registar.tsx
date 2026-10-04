@@ -38,7 +38,7 @@ export default function Registar() {
 
     return (
         <LayoutAuth>
-            <Head title="Criar conta — SGO">
+            <Head title="Criar conta">
                 <meta
                     name="description"
                     content="Criar uma conta no SGO. O perfil é atribuído depois por um administrador."

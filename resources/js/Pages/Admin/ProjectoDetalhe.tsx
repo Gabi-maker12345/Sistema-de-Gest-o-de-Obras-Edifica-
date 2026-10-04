@@ -109,7 +109,7 @@ export default function ProjectoDetalhe({ id }: { id: string }) {
 
     return (
         <LayoutAdmin>
-            <Head title={`${projecto.nome} — SGO`}>
+            <Head title={projecto.nome}>
                 <meta name="description" content={`Ficha do projecto ${projecto.nome}.`} />
             </Head>
 
@@ -294,7 +294,7 @@ export default function ProjectoDetalhe({ id }: { id: string }) {
 function ProjectoInexistente({ id }: { id: string }) {
     return (
         <LayoutAdmin>
-            <Head title="Projecto não encontrado — SGO" />
+            <Head title="Projecto não encontrado" />
             <div className="mx-auto max-w-3xl px-4 py-16 sm:px-6">
                 <Folha traco="carimbado">
                     <FolhaCabecalho>
