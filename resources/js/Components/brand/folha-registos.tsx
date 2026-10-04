@@ -30,6 +30,7 @@ export function FolhaRegistos<L>({
     children,
     vazio,
     contagem,
+    accoes,
     className,
 }: {
     titulo: string;
@@ -43,15 +44,24 @@ export function FolhaRegistos<L>({
     children: (linha: L, indice: number) => ReactNode;
     /** O texto do estado sem registo, já distinguindo filtro de sessão vazia. */
     vazio: string;
-    contagem?: ReactNode;
-    className?: string;
+contagem?: ReactNode;
+      /**
+       * O que fica no canto da folha, à direita da contagem: o botão de criar
+       * que a spec pede em todos os módulos de registo. Vem como nó para a
+       * folha continuar a não saber o que se cria — só onde abrir a ficha.
+       */
+      accoes?: ReactNode;
+      className?: string;
 }) {
     return (
         <section className={cn('space-y-2', className)}>
-            <div className="flex flex-wrap items-end justify-between gap-3 border-b border-graphite-32 pb-2">
-                <h2 className="cota text-graphite">{titulo}</h2>
-                {contagem && <p className="cota">{contagem}</p>}
-            </div>
+<div className="flex flex-wrap items-end justify-between gap-3 border-b border-graphite-32 pb-2">
+              <h2 className="cota text-graphite">{titulo}</h2>
+              <div className="flex flex-wrap items-center gap-3">
+                  {contagem && <p className="cota">{contagem}</p>}
+                  {accoes}
+              </div>
+          </div>
 
             {linhas.length === 0 ? (
                 <p className="border border-dashed border-graphite-32 p-6 text-sm text-graphite-64">

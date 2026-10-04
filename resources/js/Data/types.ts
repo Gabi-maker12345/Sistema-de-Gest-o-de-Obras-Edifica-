@@ -49,12 +49,22 @@ export type ImpactoDecisao = 'custo' | 'prazo' | 'ambito';
 export type TipoIndicador = 'custo' | 'prazo' | 'qualidade' | 'seguranca';
 
 export type TipoDocumento =
-    | 'contrato'
-    | 'licenca'
-    | 'planta'
-    | 'especificacao'
-    | 'factura'
-    | 'outro';
+      | 'contrato'
+      | 'licenca'
+      | 'planta'
+      | 'especificacao'
+      | 'factura'
+      | 'outro';
+
+/**
+ * A que se prende um anexo.
+ *
+ * A spec obriga a escolher o tipo *antes* da entidade, porque a lista de
+ * entidades muda com ele: uma factura aponta para um fornecedor, um caderno de
+ * encargos para uma tarefa. Escolher a entidade primeiro obrigaria a adivinhar
+ * de que lista se trata.
+ */
+export type EntidadeDocumento = 'projecto' | 'tarefa' | 'despesa' | 'fornecedor';
 
 export interface Utilizador {
     id: string;
@@ -220,14 +230,21 @@ export interface Fotografia {
 }
 
 export interface DocumentoSgo {
-    id: string;
-    projectoId: string | null;
-    tipoDocumento: TipoDocumento;
-    nomeFicheiro: string;
-    versao: number;
-    tamanho: string;
-    uploadPor: string;
-    criadoEm: string;
+      id: string;
+      projectoId: string | null;
+      tipoDocumento: TipoDocumento;
+      nomeFicheiro: string;
+      versao: number;
+      tamanho: string;
+      uploadPor: string;
+      criadoEm: string;
+      /**
+       * A entidade presa ao anexo. `projectoId` continua a ser a verdade da
+       * folha — é a obra que se vê listada — mas o anexo pode estar preso a uma
+       * tarefa, despesa ou fornecedor em vez de à obra em si.
+       */
+      associarA?: EntidadeDocumento;
+      entidadeRelacionadaId?: string | null;
 }
 
 export interface Fornecedor {

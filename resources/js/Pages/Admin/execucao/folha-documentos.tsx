@@ -1,4 +1,4 @@
-import { useMemo } from 'react';
+import { useMemo, useState } from 'react';
 
 import { useBusca } from '@/Components/brand/contexto-busca';
 import { FolhaRegistos } from '@/Components/brand/folha-registos';
@@ -8,6 +8,9 @@ import { data, normalizar } from '@/lib/format';
 import { ROTULOS } from '@/lib/rotulos';
 
 import { BotaoLimpar } from '@/Components/brand/botao-limpar';
+import { Botao } from '@/Components/ui/button';
+
+import { ModalDocumento } from '../ModalDocumento';
 
 /**
  * Os documentos do projecto.
@@ -31,6 +34,7 @@ export function FolhaDocumentos({
     className?: string;
 }) {
     const { estado } = useSgo();
+    const [fichaAberta, definirFichaAberta] = useState(false);
     const { termo, limpar } = useBusca();
 
     const documentos = useMemo(() => {
@@ -48,9 +52,19 @@ export function FolhaDocumentos({
             .sort((a, b) => b.criadoEm.localeCompare(a.criadoEm));
     }, [estado.documentos, projectoId, termo]);
 
-    return (
-        <FolhaRegistos<DocumentoSgo>
-            titulo="Documentos"
+return (
+            <>
+                <FolhaRegistos<DocumentoSgo>
+                    titulo="Documentos"
+                    accoes={
+                        <Botao
+                            variante="primario"
+                            tamanho="sm"
+                            onClick={() => definirFichaAberta(true)}
+                        >
+                            + Anexar documento
+                        </Botao>
+                    }
             contagem={
                 termo.trim().length > 0 ? (
                     <BotaoLimpar aoLimpar={limpar} />
@@ -96,10 +110,17 @@ export function FolhaDocumentos({
                         <p className="cota tabular md:text-right">{data(documento.criadoEm)}</p>
                     </div>
                 );
-            }}
-        </FolhaRegistos>
-    );
-}
+}}
+                </FolhaRegistos>
+
+                <ModalDocumento
+                    aberto={fichaAberta}
+                    documento={null}
+                    aoFechar={() => definirFichaAberta(false)}
+                />
+            </>
+        );
+    }
 
 const COLUNAS = [
     {

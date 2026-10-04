@@ -1,4 +1,4 @@
-import type {
+﻿import type {
     CategoriaDespesa,
     CondicaoMeteorologica,
     EstadoActividade,
@@ -11,7 +11,8 @@ import type {
     PapelProjecto,
     PerfilUtilizador,
     PrioridadeTarefa,
-    TipoDocumento,
+EntidadeDocumento,
+     TipoDocumento,
     TipoEvento,
     TipoIndicador,
 } from '@/Data/types';
@@ -123,6 +124,18 @@ const ROTULOS = {
         factura: 'Factura',
         outro: 'Outro',
     } satisfies Record<TipoDocumento, string>,
+
+  /**
+* A que se liga um anexo. A ordem é a da ficha: primeiro o tipo a que
+     * se liga, depois a entidade — invertida, a lista de entidades não se sabe de
+     * que tabela tirar.
+   */
+  entidadeDocumento: {
+      projecto: 'Projecto',
+      tarefa: 'Tarefa',
+      despesa: 'Despesa',
+      fornecedor: 'Fornecedor',
+  } satisfies Record<EntidadeDocumento, string>,
 
     tipoIndicador: {
         custo: 'Custo',

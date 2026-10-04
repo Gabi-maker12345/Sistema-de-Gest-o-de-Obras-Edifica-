@@ -1,4 +1,4 @@
-import { useMemo } from 'react';
+import { useMemo, useState } from 'react';
 
 import { useOrdem } from '@/Components/brand/cabecalho-cota';
 import { useBusca } from '@/Components/brand/contexto-busca';
@@ -11,6 +11,9 @@ import { data, normalizar } from '@/lib/format';
 import { ROTULOS } from '@/lib/rotulos';
 
 import { BotaoLimpar } from '@/Components/brand/botao-limpar';
+import { Botao } from '@/Components/ui/button';
+
+import { ModalDiario } from '../ModalDiario';
 
 /**
  * O diário de obra: um registo por projecto e dia.
@@ -32,6 +35,7 @@ export function FolhaDiario({
     className?: string;
 }) {
     const { estado } = useSgo();
+    const [fichaAberta, definirFichaAberta] = useState(false);
     const { termo, limpar } = useBusca();
     const { ordem, alternar, ordenar } = useOrdem<DiarioObra>(COLUNAS, 'data');
 
@@ -62,9 +66,19 @@ export function FolhaDiario({
 
     const pendentes = linhas.filter((diario) => !diario.sincronizado);
 
-    return (
-        <FolhaRegistos<DiarioObra>
-            titulo="Diário de obra"
+return (
+            <>
+                <FolhaRegistos<DiarioObra>
+                    titulo="Diário de obra"
+                    accoes={
+                        <Botao
+                            variante="primario"
+                            tamanho="sm"
+                            onClick={() => definirFichaAberta(true)}
+                        >
+                            + Novo dia
+                        </Botao>
+                    }
             contagem={
                 termo.trim().length > 0 ? (
                     <BotaoLimpar aoLimpar={limpar} />
@@ -139,10 +153,18 @@ export function FolhaDiario({
                         </p>
                     </div>
                 );
-            }}
-        </FolhaRegistos>
-    );
-}
+}}
+                </FolhaRegistos>
+
+                <ModalDiario
+                    aberto={fichaAberta}
+                    diario={null}
+                    comProjecto={projectoId}
+                    aoFechar={() => definirFichaAberta(false)}
+                />
+            </>
+        );
+    }
 
 const COLUNAS = [
     { chave: 'data', cota: 'Dia', valor: (diario: DiarioObra) => diario.data },

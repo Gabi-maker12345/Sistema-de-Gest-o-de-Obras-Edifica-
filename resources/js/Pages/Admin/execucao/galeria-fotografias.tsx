@@ -1,4 +1,4 @@
-import { useMemo } from 'react';
+import { useMemo, useState } from 'react';
 
 import { useBusca } from '@/Components/brand/contexto-busca';
 import { SeloSincronizacao } from '@/Components/brand/selo-sincronizacao';
@@ -8,6 +8,9 @@ import { data, normalizar } from '@/lib/format';
 import { cn } from '@/lib/utils';
 
 import { BotaoLimpar } from '@/Components/brand/botao-limpar';
+import { Botao } from '@/Components/ui/button';
+
+import { ModalFotografia } from '../ModalFotografia';
 
 /**
  * A galeria de fotografias do projecto.
@@ -35,6 +38,7 @@ export function FolhaFotografias({
 }) {
     const { estado } = useSgo();
     const { termo, limpar } = useBusca();
+    const [fichaAberta, definirFichaAberta] = useState(false);
 
     const fotografias = useMemo(() => {
         const alvo = normalizar(termo.trim());
@@ -54,18 +58,29 @@ export function FolhaFotografias({
     const pendentes = fotografias.filter((fotografia) => !fotografia.sincronizado);
 
     return (
-        <section className={cn('space-y-2', className)}>
-            <div className="flex flex-wrap items-end justify-between gap-3 border-b border-graphite-32 pb-2">
-                <h2 className="cota text-graphite">Fotografias</h2>
-                {termo.trim().length > 0 ? (
-                    <BotaoLimpar aoLimpar={limpar} />
-                ) : (
-                    <p className="cota">
-                        {fotografias.length} fotografias
-                        {pendentes.length > 0 && ` · ${pendentes.length} por sincronizar`}
-                    </p>
-                )}
-            </div>
+            <>
+                <section className={cn('space-y-2', className)}>
+                    <div className="flex flex-wrap items-end justify-between gap-3 border-b border-graphite-32 pb-2">
+                        <h2 className="cota text-graphite">Fotografias</h2>
+                        <div className="flex flex-wrap items-center gap-3">
+                            {termo.trim().length > 0 ? (
+                                <BotaoLimpar aoLimpar={limpar} />
+                            ) : (
+                                <p className="cota">
+                                    {fotografias.length} fotografias
+                                    {pendentes.length > 0 &&
+                                        ` · ${pendentes.length} por sincronizar`}
+                                </p>
+                            )}
+                            <Botao
+                                variante="primario"
+                                tamanho="sm"
+                                onClick={() => definirFichaAberta(true)}
+                            >
+                                + Nova fotografia
+                            </Botao>
+                        </div>
+                    </div>
 
             {fotografias.length === 0 ? (
                 <p className="border border-dashed border-graphite-32 p-6 text-sm text-graphite-64">
@@ -81,10 +96,18 @@ export function FolhaFotografias({
                         </li>
                     ))}
                 </ul>
-            )}
-        </section>
-    );
-}
+)}
+                </section>
+
+                <ModalFotografia
+                    aberto={fichaAberta}
+                    fotografia={null}
+                    comProjecto={projectoId}
+                    aoFechar={() => definirFichaAberta(false)}
+                />
+            </>
+        );
+    }
 
 function Moldura({ fotografia }: { fotografia: Fotografia }) {
     const { estado } = useSgo();

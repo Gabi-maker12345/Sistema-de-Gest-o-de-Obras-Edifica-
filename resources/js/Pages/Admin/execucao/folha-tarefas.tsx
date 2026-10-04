@@ -5,6 +5,7 @@ import { useBusca } from '@/Components/brand/contexto-busca';
 import { FiltroChip, FiltrosFolha } from '@/Components/brand/filtros-folha';
 import { FolhaRegistos } from '@/Components/brand/folha-registos';
 import { EstadoSelo } from '@/Components/ui/badge';
+import { Botao } from '@/Components/ui/button';
 import { TextoLongo } from '@/Components/brand/texto-longo';
 import { useSgo } from '@/Data/SgoContext';
 import type { Tarefa } from '@/Data/types';
@@ -12,6 +13,8 @@ import { data, normalizar } from '@/lib/format';
 import { diaDe, chaveDia } from '@/lib/agenda';
 import { ROTULOS } from '@/lib/rotulos';
 import { cn } from '@/lib/utils';
+
+import { ModalTarefa } from '../ModalTarefa';
 
 import { BotaoLimpar } from '@/Components/brand/botao-limpar';
 
@@ -37,6 +40,9 @@ export function FolhaTarefas({
     const { estado } = useSgo();
     const { termo, limpar } = useBusca();
     const [actividadeId, definirActividade] = useState<string | null>(null);
+    // A obra e, se houver uma, a actividade que o filtro já está a mostrar:
+    // abrir «+ Nova tarefa» a partir de uma actividade nascida com ela.
+    const [fichaAberta, definirFichaAberta] = useState(false);
     const { ordem, alternar, ordenar } = useOrdem<Tarefa>(COLUNAS, 'prazo');
 
     const actividades = useMemo(
@@ -111,6 +117,15 @@ export function FolhaTarefas({
 
             <FolhaRegistos<Tarefa>
                 titulo="Tarefas"
+                accoes={
+                    <Botao
+                        variante="primario"
+                        tamanho="sm"
+                        onClick={() => definirFichaAberta(true)}
+                    >
+                        + Nova tarefa
+                    </Botao>
+                }
                 ordem={ordem}
                 alternar={alternar}
                 colunas={COLUNAS}
@@ -187,6 +202,13 @@ export function FolhaTarefas({
                     );
                 }}
             </FolhaRegistos>
+
+            <ModalTarefa
+                aberto={fichaAberta}
+                tarefa={null}
+                comProjecto={projectoId}
+                aoFechar={() => definirFichaAberta(false)}
+            />
         </div>
     );
 }

@@ -1,15 +1,18 @@
-import { useMemo } from 'react';
+import { useMemo, useState } from 'react';
 
 import { BotaoLimpar } from '@/Components/brand/botao-limpar';
 import { useOrdem } from '@/Components/brand/cabecalho-cota';
 import { useBusca } from '@/Components/brand/contexto-busca';
 import { FolhaRegistos } from '@/Components/brand/folha-registos';
 import { EstadoSelo } from '@/Components/ui/badge';
+import { Botao } from '@/Components/ui/button';
 import { Medidor } from '@/Components/ui/progress';
 import { useSgo } from '@/Data/SgoContext';
 import type { Actividade } from '@/Data/types';
 import { data, normalizar } from '@/lib/format';
 import { cn } from '@/lib/utils';
+
+import { ModalActividade } from '../ModalActividade';
 
 /**
  * As actividades de um projecto.
@@ -39,6 +42,10 @@ export function FolhaActividades({
     const { estado } = useSgo();
     const { termo, limpar } = useBusca();
     const { ordem, alternar, ordenar } = useOrdem<Actividade>(COLUNAS, 'nome');
+    // A obra já está escolhida nesta folha, por isso a ficha de criação abre com o
+    // projecto preenchido e bloqueado — que é o que a spec pede para a actividade
+    // nascida aqui.
+    const [fichaAberta, definirFichaAberta] = useState(false);
 
     const actividades = useMemo(
         () => estado.actividades.filter((actividade) => actividade.projectoId === projectoId),
@@ -77,8 +84,18 @@ export function FolhaActividades({
     const concluidas = actividades.filter((actividade) => actividade.estado === 'concluida').length;
 
     return (
-        <FolhaRegistos<Actividade>
-            titulo="Actividades"
+        <>
+            <FolhaRegistos<Actividade>
+                titulo="Actividades"
+                accoes={
+                    <Botao
+                        variante="primario"
+                        tamanho="sm"
+                        onClick={() => definirFichaAberta(true)}
+                    >
+                        + Nova actividade
+                    </Botao>
+                }
             contagem={
                 termo.trim().length > 0 ? (
                     <BotaoLimpar aoLimpar={limpar} />
@@ -163,7 +180,15 @@ export function FolhaActividades({
                     </div>
                 );
             }}
-        </FolhaRegistos>
+            </FolhaRegistos>
+
+            <ModalActividade
+                aberto={fichaAberta}
+                actividade={null}
+                comProjecto={projectoId}
+                aoFechar={() => definirFichaAberta(false)}
+            />
+        </>
     );
 }
 
